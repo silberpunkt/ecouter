@@ -126,4 +126,4 @@ In the 1980s, Digital Equipment Corporation's hardware text-to-speech system, DE
 
 The code is MIT; see [LICENSE](LICENSE). The rules remain public domain.
 
-Ecouter is the voice of Bela, the Vespers bat, a widget for the Claude desktop app that has its own repository.
+Ecouter is the voice of Bela, the Vespers bat, a widget for the Claude desktop app that has [its own repository](https://github.com/silberpunkt/vespers).
