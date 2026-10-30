@@ -1,0 +1,136 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tint</title>
+<style>
+  /* THE LIGHTS (user1, 11 x 2026): five, as variables; each light also gives the lamp its base ink and its guard */
+  body { --bg: #111; --ink: #e8e8e8; --dim: #bbb; --line: #333; --pane: #000; --btn: #0031c48c; --edge: #58bff0; --on: #f0a437 }
+  body.day { --bg: #f7f7f5; --ink: #222; --dim: #555; --line: #c8c8c8; --pane: #fff; --btn: #e4ecff; --edge: #1f5f99; --on: #a8590a }
+  body.dusk { --bg: #2a2a2e; --ink: #c4c4c0; --dim: #8a8a88; --line: #44444a; --pane: #222226; --btn: #2c3a5c; --edge: #6d86b8; --on: #d9a85a }
+  body.night { --bg: #000; --ink: #e8e8e8; --dim: #9a9a9a; --line: #555; --pane: #000; --btn: #1a1a1a; --edge: #777; --on: #fff }
+  button i { font-style: normal; font-family: "Segoe UI Symbol", "Noto Sans Symbols2", "Symbola", sans-serif; font-variant-emoji: text }   /* the signs as text glyphs, not color pictures */
+  body { font: 15px/1.45 Iosevka, Consolas, monospace; margin: 24px auto; max-width: 860px; padding: 0 16px; background: var(--bg); color: var(--ink) }
+  h1 { font-size: 20px; margin: 0 0 6px } h2 { font-size: 15px; margin: 10px 0 2px } p { margin: 6px 0; color: var(--dim) }
+  textarea { width: 100%; height: 96px; box-sizing: border-box; font: inherit; font-size: 19px; line-height: 1.6; background: var(--pane); color: var(--ink); border: 1px solid var(--line); padding: 14px 16px; margin-top: 12px; display: block }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0 }
+  button { font: inherit; color: var(--ink); background: var(--btn); border: 1px solid var(--edge); border-radius: 2px; padding: 3px 12px; cursor: pointer }
+  label { color: var(--dim) } label input { width: 56px; font: inherit; background: var(--pane); color: var(--ink); border: 1px solid var(--line); margin-left: 4px }
+  #lit { font-size: 19px; line-height: 1.6; white-space: pre-wrap; background: var(--pane); padding: 14px 16px; border: 1px solid var(--line); border-top: 0; min-height: 3em }
+  #legend { color: #888; font-size: 13px; margin: 4px 0 0 }
+  hr { border: 0; border-top: 1px solid var(--line); margin: 10px 0 }
+  button.on { border-color: #f0a437; color: #f0a437 }
+  .w.done { box-shadow: 1px 0 0 var(--dim) }         /* the head: a grey right edge on the word being said */
+  #lit { --glow: 1 } #lit span[style*="--room"] { background: rgb(var(--room) / calc(var(--ra) * var(--glow))) }   /* the room, scaled by the glow slider in CSS alone */
+  #lit:focus { outline: 1px solid var(--edge) }       /* the pane is the editor; a quiet edge when it has the caret */
+</style>
+<h1>A sonic lamp lights the tint hiding within text.</h1>
+<p>Here is how it works. Each letter takes the color of the tone the voice would give it, and the color is as strong as the tone is far
+from flat. Flat is green. A question lifts toward blue, an exclamation drops toward red. Omnia, shown first, spreads the voice's own range over the
+whole wheel, so the two ends meet in magenta; Viriditas, the quiet reading mode, turns the wheel once an octave and stays near green.</p>
+<div class="row lights"><button data-light="day" title="The normal state of all applications and websites in the past."><i>☀</i> Day</button><button data-light="dusk" title="Dark mode. Diminished contrast, much diminished flux."><i>◐</i> Dusk</button><button data-light="night" class="on" title="Black and white, with grey lines."><i>☽</i> Night</button><span class="gap"></span><button id="chaucer" title="Twelve lines from the General Prologue, in his own spelling."><i>🙫︎</i> Chaucer</button></div>
+<textarea id="t">It's not only everyone; it's you, too. Right? ... Right!</textarea>
+<div id="lit" contenteditable="true" spellcheck="false" title="Type here. The color follows the typing."></div>
+<div class="row"><span class="modes"><button data-mode="none" title="The text as it is, to compare in place.">None</button><button data-mode="viriditas" title="Green at rest. One turn of the wheel an octave, mixed into white."><i>🌳︎</i> Viriditas</button><button data-mode="omnia" class="on" title="The same tilts told over the whole wheel. The mix goes all the way to color."><i>🎨︎</i> Omnia</button><button data-mode="vivificat" title="A blend of both, leaning to Omnia by 62 hundredths."><i>🖌︎</i> Vivificat</button></span><span class="gap"></span><button id="stop" title="Stops the voice.">■ Stop</button><button id="say" title="Plays the text in the house voice.">▶ Play</button></div>
+<p id="legend">Flat is green. Up the wheel, cyan then blue, is a higher tone. Down the wheel, yellow then red, is a lower one. In Viriditas one turn is one octave; in Omnia an eighth of an octave each way is half a turn.</p>
+<hr>
+<div class="row">Background: <span class="rooms"><button data-room="none" class="on" title="No background.">None</button><button data-room="close" title="A small, intimate room. A shul for whispers.">Close</button><button data-room="normal" title="The room as proposed. The tune's trailing average, lit by the voice's ring.">Normal</button><button data-room="royal" title="The stone hall of Elizabeth R.">Royal</button></span><label>Glow: <input id="glow" type="range" min="0" max="3" step="0.1" value="1" title="How visible the room is."></label></div>
+<hr>
+<div class="row"><label>Mix: <input id="mix" type="number" min="0" max="1" step="0.05" value="0.75" title="How far a full tilt leaves the ink for its color."></label><label>Full coloring at <input id="full" type="number" min="0.025" max="1" step="0.025" value="0.125" title="Octaves from flat at which a letter reaches full color."> octave.</label><button id="auto" title="Flat becomes the text's own median pitch, and its widest tilt fills the color.">Auto</button></div>
+<p>Units: Octaves from flat to full color. Auto reads the text.</p>
+<hr>
+<h2>How to use.</h2>
+<p>Write the thing. Tint it. Where it runs white for two lines, that is where someone would have liked to say "wait" and could not. Put a mark there. Not for grammar. For them.</p>
+<script src="../viriditas.js"></script>
+<script src="../ecouter.js"></script>
+<script>
+// Viriditas tints; Ecouter speaks. This page colors with the first and plays with the second.
+function $(id) { return document.getElementById(id); }
+function tint() {
+  var mix = +$("mix").value || 0, full = +$("full").value || 0.125;
+  var L = LIGHTS[light], opts = { mix: mix, full: full, words: true, auto: $("auto").classList.contains("on"), mode: mode, white: L.base, room: roomName };
+  if (L.floor !== undefined) opts.floor = L.floor; if (L.ceiling !== undefined) opts.ceiling = L.ceiling; if (L.step) opts.step = L.step; opts.roomLift = L.lift;
+  $("lit").innerHTML = VIRIDITAS.html($("t").value, opts);
+}
+// THE LIGHTS: each gives the page its variables and the lamp its base ink and guard. On a light ground the
+// ink is dark and a color must not go too light (a ceiling); on a dark one it must not go too dark (a floor).
+// (Noct, the golden angle an octave, and Daybreak were tried and taken off at user1's word: little effect on
+// the coloring, and two more buttons to confuse; the lamp keeps step and ceiling for whoever wants them.)
+// each light has its own glow to begin (user1, 11 x: by day a quarter to two thirds, since back-color reads as
+// highlight; by night more, since a tint on black shows only by the hue's own brightness) and, on a dark ground,
+// a lift of the room's hue toward white so a blue hall is not crushed to black
+var LIGHTS = {
+  day:      { base: [34, 34, 34],    ceiling: 0.5, glow: 0.4, lift: 0 },
+  dusk:     { base: [196, 196, 192], floor: 0.42, glow: 1.2, lift: 0.2 },
+  night:    { base: [232, 232, 232], floor: 0.6,  glow: 1.8, lift: 0.3 }
+};
+var light = "night"; try { light = localStorage.getItem("tint.light") || light; } catch (e) {}
+function setLight(name) {
+  light = LIGHTS[name] ? name : "night"; document.body.className = light;
+  [].forEach.call(document.querySelectorAll(".lights button"), function (b) { b.classList.toggle("on", b.getAttribute("data-light") === light); });
+  try { localStorage.setItem("tint.light", light); } catch (e) {}
+}
+[].forEach.call(document.querySelectorAll(".lights button"), function (b) { b.onclick = function () { setLight(b.getAttribute("data-light")); $("glow").value = glowOf(); glow(); tint(); }; });   // each light brings its own glow
+setLight(light);
+// the glow: a slider that scales the room in CSS alone, no span re-rendered
+function glowOf() { var v = null; try { v = localStorage.getItem("tint.glow." + light); } catch (e) {} return v === null ? LIGHTS[light].glow : +v; }   // the glow is kept per light
+function glow() { $("lit").style.setProperty("--glow", $("glow").value); try { localStorage.setItem("tint.glow." + light, $("glow").value); } catch (e) {} }
+["input", "change"].forEach(function (ev) { $("glow").addEventListener(ev, glow); });
+$("glow").value = glowOf(); glow();
+// the rooms: four buttons, one in at a time
+var roomName = "none"; try { roomName = localStorage.getItem("tint.room") || roomName; } catch (e) {}
+[].forEach.call(document.querySelectorAll(".rooms button"), function (b) {
+  b.classList.toggle("on", b.getAttribute("data-room") === roomName);
+  b.onclick = function () { roomName = b.getAttribute("data-room"); [].forEach.call(document.querySelectorAll(".rooms button"), function (x) { x.classList.toggle("on", x === b); }); try { localStorage.setItem("tint.room", roomName); } catch (e) {} tint(); };
+});
+// four car-radio buttons, one in at a time: a mode shift (user1, 11 x 2026); None first, to compare in place
+// Omnia first (user1, 28 x 2026: "The mind will be yelling, IT'S A GREENIFYER! When it is no such thing.")
+var mode = "omnia"; try { mode = localStorage.getItem("tint.mode") || mode; } catch (e) {}
+[].forEach.call(document.querySelectorAll(".modes button"), function (b) {
+  b.classList.toggle("on", b.getAttribute("data-mode") === mode);
+  b.onclick = function () { mode = b.getAttribute("data-mode"); [].forEach.call(document.querySelectorAll(".modes button"), function (x) { x.classList.toggle("on", x === b); }); try { localStorage.setItem("tint.mode", mode); } catch (e) {} tint(); };
+});
+["input", "change"].forEach(function (ev) { $("mix").addEventListener(ev, tint); $("full").addEventListener(ev, tint); });
+$("auto").onclick = function () { this.classList.toggle("on"); tint(); };
+$("t").addEventListener("input", tint);                // the tinted view follows the typing, directly beneath it
+// TYPING IN THE PREVIEW (user1, 11 x 2026: "allow free-typing in the Tint preview area ... People would crowd one
+// another out of the way to try typing things"). The pane is editable; each keystroke re-tints it from the score,
+// which is a millisecond, and the caret is put back where it was by counting characters. Enter is made a plain
+// newline so the pane stays text in spans, and the text above is kept in step.
+function caretAt() { var sel = window.getSelection(); if (!sel.rangeCount) return -1; var r = sel.getRangeAt(0), pre = r.cloneRange(); pre.selectNodeContents($("lit")); pre.setEnd(r.endContainer, r.endOffset); return pre.toString().length; }
+function putCaret(n) {
+  var lit = $("lit"), walker = document.createTreeWalker(lit, NodeFilter.SHOW_TEXT), node, seen = 0, sel = window.getSelection(), r = document.createRange();
+  while ((node = walker.nextNode())) { if (seen + node.length >= n) { r.setStart(node, n - seen); r.collapse(true); sel.removeAllRanges(); sel.addRange(r); return; } seen += node.length; }
+  r.selectNodeContents(lit); r.collapse(false); sel.removeAllRanges(); sel.addRange(r);
+}
+// CHAUCER (user1, 12 x 2026: "decent Chaucer which lights up like a vision"): the General Prologue, the Yeoman, in his own spelling
+var CHAUCER = ["Actual Chaucer", "  A sheef of pecok arwes, bright and kene,", "  Under his belt he bar ful thriftily", "  (Wel koude he dresse his takel yemanly:", "  His arwes drouped noght with fetheres lowe.)", "",
+  "  And in his hand he baar a myghty bowe.", "  A not-heed hadde he, with a broun viságe.", "  Of woodecraft wel koude he al the uságe.", "  Upon his arm he baar a gay bracer,", "",
+  "  A Cristophere on his brest of silver sheene.", "  An horn he bar, the bawdryk was of grene;", "  A forster was he, soothly, as I gesse.", "  Ther was also a Nonne, a Prioresse, (...)"].join(String.fromCharCode(10));
+$("chaucer").onclick = function () { $("t").value = CHAUCER; tint(); };
+$("lit").addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); document.execCommand("insertText", false, String.fromCharCode(10)); } });
+$("lit").addEventListener("input", function () { var n = caretAt(); $("t").value = $("lit").textContent; tint(); if (n >= 0) putCaret(n); });
+var ctx = null, playing = null, startAt = 0;
+// THE WORD HEAD (user1, 11 x 2026: "draw the right-edge of each word-box in gray, as the speech continues ... it
+// should only be drawn during playback"). Each word carries the millisecond its sound ends, from the same score
+// the throat sings; while the sound plays, the word being said wears a grey right edge, one head only; at the
+// end it is cleared.
+function headLoop() {
+  var ws = $("lit").querySelectorAll(".w"), i, ms;
+  if (!playing) { for (i = 0; i < ws.length; i++) ws[i].classList.remove("done"); return; }
+  ms = (ctx.currentTime - startAt) * 1000;
+  var now = -1; for (i = 0; i < ws.length; i++) if (+ws[i].getAttribute("data-end") > ms) { now = i; break; }   // the word being said: one head only (user1: "the eye rests with the last one")
+  for (i = 0; i < ws.length; i++) ws[i].classList.toggle("done", i === now);
+  requestAnimationFrame(headLoop);
+}
+$("say").onclick = function () {
+  tint(); var pcm = ECOUTER.say($("t").value); ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+  if (playing) { try { playing.onended = null; playing.stop(); } catch (e) {} playing = null; }
+  pcm = ECOUTER.lead(pcm);                           // the lead: a third of a second of silence first (user1)
+  var b = ctx.createBuffer(1, pcm.length, ECOUTER.SR); b.getChannelData(0).set(pcm);
+  var s = ctx.createBufferSource(); s.buffer = b; s.connect(ctx.destination);
+  s.onended = function () { if (playing === s) { playing = null; headLoop(); } };
+  playing = s; startAt = ctx.currentTime + 0.333; s.start(); requestAnimationFrame(headLoop);
+};
+$("stop").onclick = function () { if (playing) { try { playing.onended = null; playing.stop(); } catch (e) {} playing = null; headLoop(); } };   // Stop, for long passages (user1)
+tint();
+</script>

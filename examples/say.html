@@ -1,0 +1,145 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>say</title>
+<style>
+  body { font: 15px/1.45 Iosevka, Consolas, monospace; margin: 24px auto; max-width: 860px; padding: 0 16px; background: #111; color: #eee }
+  h1 { font-size: 22px; margin: 0 0 6px } p { margin: 6px 0; color: #bbb } p b { color: #eee; font-weight: 600 }
+  textarea { width: 100%; height: 72px; box-sizing: border-box; font: inherit; background: #000; color: #eee; border: 1px solid #444; padding: 6px; margin-top: 12px }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0 }
+  button { font: inherit; color: #eee; background: #0031c48c; border: 1px solid #58bff0; border-radius: 2px; padding: 3px 12px; cursor: pointer }
+  button.on { border-color: var(--on); color: var(--on) }
+  .gap { flex: 1 1 auto } #stop { margin-left: auto } label input[type=range] { width: 120px; vertical-align: middle; margin-left: 6px }
+  .modes, .rooms { display: inline-flex; gap: 0 } .modes button, .rooms button { border-radius: 0 } .modes button:first-child, .rooms button:first-child { border-radius: 2px 0 0 2px } .modes button:last-child, .rooms button:last-child { border-radius: 0 2px 2px 0 }
+  #out { color: #9c9; font-size: 13px; word-break: break-word; min-height: 1.4em }
+  .graph { position: relative; margin-top: 8px } canvas { display: block; width: 100%; background: #000 } #wave { height: 120px } #pic { height: 170px }
+  .head { position: absolute; top: 0; bottom: 0; left: 0; border-left: 1px solid #f05858; display: none; pointer-events: none }
+  p.key { margin-top: 10px }
+</style>
+<h1>Say</h1>
+<p><b>ecouter.js</b> is a featherlight, instrumented text-to-speech library in one file, no dependencies. Type a sentence; a formant
+throat says it in the house voice, and every stage of the sound is yours to measure, draw and change.</p>
+<p>What is inside: a Klatt cascade of five formants with life, a second vent for hisses and bursts, a nasal zero, a ceiling at the
+lips and a governor; a spectrogram gust and its sound; a chain of settings; the 41 phoneme codes of NRL Report 7948; the
+Report's 355 letter-to-sound rules, public domain since 1985, and their matcher.</p>
+<p>This page tests all of it at once: the rules read the text, the throat sings it, the chain tunes it, and the wave and
+the picture below are of what you hear. The toggles are the tunings laid on the rough signal; flip one and the text is said again.</p>
+<textarea id="t">Put the book back. How about you?</textarea>
+<div class="row"><button id="say">Say</button><button id="stop">Stop</button><button id="save">Save .wav</button><span id="out"></span></div>
+<div class="row" id="toggles" title="The tunings laid on the rough signal, and the tune; each lit is in the chain. Flip one and the text is said again."></div>
+<div class="graph"><canvas id="wave" height="120"></canvas><i class="head" id="h1"></i></div>
+<div class="graph"><canvas id="pic" height="170"></canvas><i class="head" id="h2"></i></div>
+<p class="key">Two graphs: the waveform, then the spectrogram.<br>
+0 to 4 kHz, 60 dB deep. The voice displays in stripes.</p>
+<p class="key">Options:<br>
+Gust: The spectrogram blurred a little and sound-matched.<br>
+Silk Stocking: A shelf down above 4 kHz.<br>
+Entone: A comb on the score's own pitch.<br>
+Ess: A standard 'de-esser'.<br>
+Governor: Holds what stands above 5.5 kHz within hearing.<br>
+Mellow: A kind microphone. Highs softened, a small lift below 250 Hz, and the echo of a small room.<br>
+Conduction: The tune. Each sentence begins high, sags a little, and returns to level. Without it the voice falls a fifth across the whole, and sounds defeated. Conduction lifts the performance to the ears.<br>
+4x FGL: The fast search of Perraudin (2013). Ten turns with momentum replace forty. Judge by ear.</p>
+<p class="key">Each sentence is made in its own Web Worker, in parallel. A sentence plays when it and the one before it are done. Where workers cannot start, sentences are made one by one.</p>
+<script src="../ecouter.js"></script>
+<script>
+var SR = ECOUTER.SR, pcm = null, ctx = null, playing = null, startAt = 0;
+var voice = ECOUTER.CHAIN.settings(ECOUTER.CHAIN.PRESETS[ECOUTER.CHAIN.HOUSE_NAME]);   // the house, to begin; then as this browser last had the toggles
+try { var kept = JSON.parse(localStorage.getItem("say.toggles") || "null"); if (kept) Object.keys(kept).forEach(function (k) { if (typeof voice[k] === "boolean") voice[k] = kept[k]; }); } catch (e) {}
+function remember() { try { var o = {}; TOGGLES.forEach(function (tg) { o[tg[0]] = !!voice[tg[0]]; }); localStorage.setItem("say.toggles", JSON.stringify(o)); } catch (e) {} }
+var TOGGLES = [["gust", "Gust"], ["stocking", "Silk Stocking"], ["entone", "Entone"], ["ess", "Ess"], ["govern", "Governor"], ["mellow", "Mellow"], ["conduction", "Conduction"], ["fgl", "4x FGL"]];
+function $(id) { return document.getElementById(id); }
+TOGGLES.forEach(function (tg) {                      // buttons, lit when in the chain, as the bench has them
+  var b = document.createElement("button"); b.textContent = tg[1]; b.classList.toggle("on", !!voice[tg[0]]);
+  b.onclick = function () { voice[tg[0]] = !voice[tg[0]]; b.classList.toggle("on", !!voice[tg[0]]); remember(); if (pcm) say(); };
+  $("toggles").appendChild(b);
+});
+function fit(c) { var r = c.getBoundingClientRect(); if (c.width !== Math.round(r.width)) c.width = Math.round(r.width); return c.getContext("2d"); }
+function drawWave() {
+  var c = $("wave"), g = fit(c), W = c.width, H = c.height, x, i, a, b, lo, hi;
+  g.fillStyle = "#000"; g.fillRect(0, 0, W, H); g.strokeStyle = "#f0a437"; g.beginPath();
+  for (x = 0; x < W; x++) {
+    a = Math.floor(pcm.length * x / W); b = Math.max(a + 1, Math.floor(pcm.length * (x + 1) / W)); lo = 1; hi = -1;
+    for (i = a; i < b; i++) { if (pcm[i] < lo) lo = pcm[i]; if (pcm[i] > hi) hi = pcm[i]; }
+    g.moveTo(x + 0.5, H / 2 - hi * H * 0.48); g.lineTo(x + 0.5, H / 2 - lo * H * 0.48 + 1);
+  }
+  g.stroke();
+}
+function drawPic() {
+  var p = ECOUTER.GUST.picture(pcm), c = $("pic"), g = fit(c), W = c.width, H = c.height, bins = 128, top = 1e-9, f, k, x, y;
+  for (f = 0; f < p.mag.length; f++) for (k = 0; k < bins; k++) if (p.mag[f][k] > top) top = p.mag[f][k];
+  var img = g.createImageData(W, H);
+  for (x = 0; x < W; x++) {
+    var col = p.mag[Math.min(p.mag.length - 1, Math.floor(x * p.mag.length / W))];
+    for (y = 0; y < H; y++) {
+      var v = col[Math.min(bins - 1, Math.floor((H - 1 - y) * bins / H))], db = 20 * Math.log(v / top + 1e-6) / Math.LN10, s = Math.max(0, Math.min(1, 1 + db / 60)), o = 4 * (y * W + x);
+      img.data[o] = 255 * s; img.data[o + 1] = 190 * s * s; img.data[o + 2] = 90 * s * s * s; img.data[o + 3] = 255;
+    }
+  }
+  g.putImageData(img, 0, 0);
+}
+function setHead(u) { ["h1", "h2"].forEach(function (id) { $(id).style.left = (u * 100) + "%"; $(id).style.display = u > 0 ? "block" : "none"; }); }
+function headLoop() {                                  // the head: across all the sentences, by the clock since the first began
+  if (!playing && next >= parts.length) { setHead(0); return; }
+  var total = 0, i; for (i = 0; i < parts.length; i++) total += made[i] ? made[i].length : 0;
+  if (total > 0 && playing) setHead(Math.min(1, (ctx.currentTime - startAt) / (total / SR)));
+  requestAnimationFrame(headLoop);
+}
+function stop() { if (playing) { try { playing.onended = null; playing.stop(); } catch (e) {} playing = null; } next = parts.length; setHead(0); }
+// SAYING, A SENTENCE AT A TIME (user1, 11 x 2026: "a new Web worker per sentence, to be played when the one playing is
+// done"). The codes are cut at the marks the Lexillogue keeps; each sentence goes to a worker of its own; sentence n is
+// played when it is back and sentence n-1 has ended; the wave and the picture are drawn when all are back.
+var run = 0, parts = [], made = [], next = 0, t0 = 0, canWork = typeof Worker === "function";
+function cut(codes) {                                  // "a b . c d ?" -> ["a b .", "c d ?"]
+  var out = [], cur = [], bits = codes.trim().split(" "), i;
+  for (i = 0; i < bits.length; i++) { if (!bits[i]) continue; cur.push(bits[i]); if (bits[i] === "." || bits[i] === "?" || bits[i] === "!") { out.push(cur.join(" ")); cur = []; } }
+  if (cur.length) out.push(cur.join(" "));
+  return out;
+}
+function playPart(n) {                                 // sentence n, then the next when it ends
+  var x = n === 0 ? ECOUTER.lead(made[n]) : made[n]; ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();   // the lead: a third of a second of silence before the first sound of the chain only (user1)
+  var b = ctx.createBuffer(1, x.length, SR); b.getChannelData(0).set(x);
+  var s = ctx.createBufferSource(); s.buffer = b; s.connect(ctx.destination);
+  s.onended = function () { if (playing !== s) return; playing = null; next = n + 1; if (made[next]) playPart(next); else if (next >= parts.length) { setHead(0); } };
+  playing = s; if (n === 0) startAt = ctx.currentTime + 0.333; s.start(); if (n === 0) requestAnimationFrame(headLoop);   // the head starts after the lead
+}
+function arrived(n, x, thisRun) {
+  if (thisRun !== run) return;                          // a sentence from a Say that was abandoned
+  made[n] = x;
+  if (n === next && !playing) playPart(n);
+  var all = parts.every(function (p, i) { return !!made[i]; });
+  if (all) {
+    var total = 0, i, at = 0; for (i = 0; i < made.length; i++) total += made[i].length;
+    pcm = new Float32Array(total); for (i = 0; i < made.length; i++) { pcm.set(made[i], at); at += made[i].length; }
+    $("out").textContent = parts.join(" ") + " (" + (pcm.length / SR).toFixed(2) + " s, " + parts.length + (parts.length === 1 ? " sentence" : " sentences") + " made in " + (Date.now() - t0) + " ms" + (canWork ? ", in workers" : "") + ")";
+    drawWave(); drawPic();
+  }
+}
+function say() {
+  var text = $("t").value; stop(); run++; var thisRun = run; t0 = Date.now();
+  parts = cut(ECOUTER.codes(text)); made = []; next = 0; pcm = null;
+  if (!parts.length) { $("out").textContent = "nothing to say"; return; }
+  $("out").textContent = parts.join(" ") + " (making, " + parts.length + (parts.length === 1 ? " sentence" : " sentences") + ")";
+  var v = {}, k; for (k in voice) v[k] = voice[k];
+  parts.forEach(function (codes, n) {
+    if (canWork) {
+      try {
+        var w = new Worker("say.worker.js");
+        w.onmessage = function (e) { arrived(e.data.n, e.data.pcm, thisRun); w.terminate(); };
+        w.onerror = function () { w.terminate(); canWork = false; setTimeout(function () { arrived(n, ECOUTER.say(null, { voice: v, codes: codes }), thisRun); }, 0); };
+        w.postMessage({ n: n, codes: codes, voice: v });
+        return;
+      } catch (err) { canWork = false; }
+    }
+    setTimeout(function () { arrived(n, ECOUTER.say(null, { voice: v, codes: codes }), thisRun); }, 0);   // no workers here: one by one, the page yielding between
+  });
+}
+$("say").onclick = say; $("stop").onclick = stop;
+$("t").addEventListener("keydown", function (e) { if (e.key === "Enter" && e.ctrlKey) { e.preventDefault(); say(); } });
+$("save").onclick = function () {
+  if (!pcm) return;
+  var a = document.createElement("a"), url = URL.createObjectURL(new Blob([ECOUTER.VOICEBOX.wav(pcm, SR)], { type: "audio/wav" }));
+  a.href = url; a.download = "said.wav"; document.body.appendChild(a); a.click(); a.remove();
+};
+addEventListener("resize", function () { if (pcm) { drawWave(); drawPic(); } });
+</script>
