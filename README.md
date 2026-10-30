@@ -95,6 +95,24 @@ node test/smoke.js min      # the .min files
 
 **The temp cache.** Under Node or QuickJS, Ecouter keeps each gusted sound it makes in `temp-cache/`, in the folder you run from, named by a hash of the sound and its settings. Making the same sound again is then instant. The folder is safe to delete, and git ignores it. To keep nothing on disk, set `ECOUTER.CHAIN.cache = null`. In a web page there is no disk, and no cache.
 
+## Seen in Bela
+
+Two pictures from Bela's chat, where Viriditas colours every reply as it arrives. They show in light or dark to match your page.
+
+Bell's vowel stems, written in threes. Each glyph and its code takes the colour of the sound it stands for:
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="media/vowel-stems-dark.png">
+  <img alt="Bell's vowel stems in threes, each in the colour of its sound" src="media/vowel-stems-light.png" width="652">
+</picture>
+
+Great utterances in Bell's *Visible Speech*: "What hath God wrought", "Mary had a little lamb", "Mr. Watson, come here". Ecouter reads them straight from the glyphs:
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="media/great-utterances-dark.png">
+  <img alt="Great utterances written in Bell's Visible Speech, coloured by tone" src="media/great-utterances-light.png" width="868">
+</picture>
+
 ## Lineage
 
 In the 1980s, Digital Equipment Corporation's hardware text-to-speech system, DECtalk, let system administrators, and the many people who relied on it for access, hear a computer speak in a listenable voice. It grew out of Dennis Klatt's work on formant synthesis. Ecouter's throat follows Klatt's published 1980 paper, and its rules are the public-domain NRL rules of the same era. It is not DECtalk, and it contains none of its code.
