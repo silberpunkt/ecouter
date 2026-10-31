@@ -4,7 +4,9 @@ A tiny English text-to-speech, in one file of 54.7 KB.
 
 ## Viriditas
 
-Why Ecouter exists. We needed Ecouter to exist because the [Web Speech API](https://webaudio.github.io/web-speech-api/) does not give you back the sounds your computer's voices worked hard to produce. No, you can't have them. We would have used them to color the text, of course. That's not available. (In the current draft, `speechSynthesis.speak()` still returns nothing, and the request to [send its voice to a stream a page can use](https://github.com/WebAudio/web-speech-api/issues/69) has been open since 2019.) We did the impossible, to scrape history, sound, C, evidence, public papers, and human memory, to build a 55 KB Text-To-Speech synthesizer that actually gives you *tones of speech*. We needed it, you have it. Along the way, we found the wonderful Bells of Alexander Melville Bell, the father of A. Graham Bell, inventor of our telephone, along with many others.
+Why Ecouter exists. We needed Ecouter to exist because the [Web Speech API](https://webaudio.github.io/web-speech-api/) does not give you back the sounds your computer's voices worked hard to produce. No, you can't have them. We would have used them to color the text, of course. That's not available. (In the current draft, `speechSynthesis.speak()` still returns nothing, and the request to [send its voice to a stream a page can use](https://github.com/WebAudio/web-speech-api/issues/69) has been open since 2019.)
+
+We did the impossible, to scrape history, sound, C, evidence, public papers, and human memory, to build a 55 KB Text-To-Speech synthesizer that actually gives you *tones of speech*. We needed it, you have it. Along the way, we found the wonderful Bells of Alexander Melville Bell, the father of A. Graham Bell, inventor of our telephone, along with many others.
 
 Viriditas colours every letter by its pitch, so the tune of a sentence shows before anyone speaks it. The author of the repo ("User1") is fond of the expression "Before words say, tone tells." Please enjoy hearing your own words, and those of others, with your eyes.
 
