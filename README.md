@@ -6,7 +6,7 @@ A tiny English text-to-speech, in one file of 54.7 KB.
 
 Why Ecouter exists. We needed Ecouter to exist because the Web Speech API does not give you back the sounds your hardware worked hard to produce. No, you can't have them. We would have used them to color the text, of course. That's not available. We did the impossible, to scrape history, sound, C, evidence, public papers, and human memory, to build a 55 KB Text-To-Speech synthesizer that actually gives you *tones of speech*. We needed it, you have it. Along the way, we found the wonderful Bells of Alexander Melville Bell, the father of A. Graham Bell, inventor of our telephone, along with many others.
 
-Viriditas colours every letter by its pitch, so the tune of a sentence shows before anyone speaks it.
+Viriditas colours every letter by its pitch, so the tune of a sentence shows before anyone speaks it. The author of the repo ("User1") is fond of the expression "Before words say, tone tells." Please enjoy hearing your own words, and those of others, with your eyes.
 
 ### These colours are not random.
 
