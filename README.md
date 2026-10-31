@@ -4,7 +4,14 @@
 
 ## These colours are not random.
 
-You've seen rainbow text before, so here is the proof, the only kind worth having.
+You've seen rainbow text before, so first, the colours themselves. Here is one sentence four ways: as it is, then in each of Viriditas's three modes.
+
+![Stock white: the sentence as it is, with no colour](media/mode-1-stock-white.png)
+![Viriditas: the quiet reading mode, near green](media/mode-2-viriditas.png)
+![Vivificat: between the two](media/mode-3-vivificat.png)
+![Omnia: the voice's whole range over the whole wheel](media/mode-4-omnia.png)
+
+Where the voice holds steady, the letters stay near green; where it lifts or falls, they move away from it, further in each mode. Watch the `you` of the first question turn blue as the voice rises on it. Where those colours come from:
 
 Viriditas reads your text with the same rules a voice reads it by, and works out the pitch of every moment. Then each letter takes the colour of its own pitch:
 
@@ -14,15 +21,17 @@ Viriditas reads your text with the same rules a voice reads it by, and works out
 
 It comes in three modes, all built on the same pitches:
 
-- **Omnia**, the default, spreads the voice's own range over the whole wheel: an eighth of an octave up or down is half a turn, so the two ends meet in magenta.
 - **Viriditas** is the quiet reading mode: one turn of the wheel per octave, so ordinary speech stays near green and only a real lift or fall shows.
 - **Vivificat** sits between the two.
+- **Omnia**, the default, spreads the voice's own range over the whole wheel: an eighth of an octave up or down is half a turn, so the two ends meet in magenta.
 
-The picture below shows it. Ecouter has sung the sentence, and its real sound is drawn in grey: a spectrogram, with the voice's harmonics as bright bands. Over them, in colour, is the pitch Viriditas used for each moment. The coloured lines sit on the grey bands, because they are the same pitch. Under that, each letter sits beneath the moment it's sung, in its colour. Last comes the text as you'd read it. The page switches between the three modes without singing again, so you can watch the same pitches told three ways.
+Ask for `mode: "none"` and you get the stock white, to compare in place.
 
-![The proof: a sentence's spectrogram, its pitch in colour on top, and each letter in the colour of its moment](media/proof.png)
+The picture below shows where the colours come from; click it to open the page live and try your own sentence. Ecouter has sung the sentence, and its real sound is drawn in grey: a spectrogram, with the voice's harmonics as bright bands. Over them, in colour, is the pitch Viriditas used for each moment. The coloured lines sit on the grey bands, because they are the same pitch. Under that, each letter sits beneath the moment it's sung, in its colour. Last comes the text as you'd read it. The page switches between the three modes without singing again, so you can watch the same pitches told three ways.
 
-**[Try it with your own sentence →](examples/proof.html)**
+[![The proof: a sentence's spectrogram, its pitch in colour on top, and each letter in the colour of its moment](media/proof.png)](https://silberpunkt.github.io/ecouter/examples/proof.html)
+
+**[Try it with your own sentence →](https://silberpunkt.github.io/ecouter/examples/proof.html)**
 
 Check one letter by hand. In the sentence pictured, the `I` of "It's not only everyone" is sung at 128.4 Hz:
 
@@ -45,7 +54,7 @@ How a letter knows its pitch: a letter-to-sound rule never forgets which letters
 </script>
 ```
 
-Viriditas makes no sound and needs none. [examples/tint.html](examples/tint.html) is the full workbench: its modes, rooms and lights.
+Viriditas makes no sound and needs none. [The tint workbench](https://silberpunkt.github.io/ecouter/examples/tint.html) is the full workbench: its modes, rooms and lights.
 
 ## Ecouter speaks
 
@@ -60,7 +69,7 @@ The same rules and tune, with a throat. Type a sentence, and a small formant voi
 </script>
 ```
 
-Under Node: `const E = require('./ecouter-speech.js')`, with the same calls. [examples/say.html](examples/say.html) lets you type, hear, and see the sound.
+Under Node: `const E = require('./ecouter-speech.js')`, with the same calls. [The say page](https://silberpunkt.github.io/ecouter/examples/say.html) lets you type, hear, and see the sound.
 
 ## Which file
 
