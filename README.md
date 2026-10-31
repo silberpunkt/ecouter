@@ -132,6 +132,8 @@ Great utterances in Bell's *Visible Speech*: "What hath God wrought", "Mary had 
 
 ## Lineage
 
+Ecouter is sound design for people who read. The ears that shaped it were tuned on the instruments of [Bob Yannes](https://en.wikipedia.org/wiki/Bob_Yannes), who designed the Commodore 64's SID chip and co-founded Ensoniq, maker of the ESQ-1.
+
 In the 1980s, Digital Equipment Corporation's hardware text-to-speech system, [DECtalk](https://en.wikipedia.org/wiki/DECtalk), let system administrators, and the many people who relied on it for access, hear a computer speak in a listenable voice. It grew out of Dennis Klatt's work on formant synthesis. Ecouter's throat follows Klatt's published 1980 paper, and its rules are the public-domain NRL rules of the same era. It is not DECtalk, and it contains none of its code.
 
 ## Provenance and license
