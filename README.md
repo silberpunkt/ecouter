@@ -1,8 +1,12 @@
-# Viriditas and Ecouter
+# Ecouter
 
-**Viriditas colours each letter of a text by the tone a voice would give it. Ecouter is the voice: an English text-to-speech in one file. The voice alone is 54.7 KB.**
+A tiny English text-to-speech, in one file of 54.7 KB.
 
-## These colours are not random.
+## Viriditas
+
+Why Ecouter exists. We needed Ecouter to tell us how a voice would say each letter: where it rises, where it falls, and when. Viriditas colours every letter by that pitch, so the tune of a sentence shows before anyone speaks it.
+
+### These colours are not random.
 
 You've seen rainbow text before, so first, the colours themselves. Here is one sentence four ways: as it is, then in each of Viriditas's three modes.
 
