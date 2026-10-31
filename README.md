@@ -132,12 +132,12 @@ Great utterances in Bell's *Visible Speech*: "What hath God wrought", "Mary had 
 
 ## Lineage
 
-In the 1980s, Digital Equipment Corporation's hardware text-to-speech system, DECtalk, let system administrators, and the many people who relied on it for access, hear a computer speak in a listenable voice. It grew out of Dennis Klatt's work on formant synthesis. Ecouter's throat follows Klatt's published 1980 paper, and its rules are the public-domain NRL rules of the same era. It is not DECtalk, and it contains none of its code.
+In the 1980s, Digital Equipment Corporation's hardware text-to-speech system, [DECtalk](https://en.wikipedia.org/wiki/DECtalk), let system administrators, and the many people who relied on it for access, hear a computer speak in a listenable voice. It grew out of Dennis Klatt's work on formant synthesis. Ecouter's throat follows [Klatt's published 1980 paper](https://doi.org/10.1121/1.383940), and its rules are the public-domain NRL rules of the same era. It is not DECtalk, and it contains none of its code.
 
 ## Provenance and license
 
 - **The rules:** *Automatic Translation of English Text to Phonetics by Means of Letter-to-Sound Rules*, NRL Report 7948, Elovitz, Johnson, McHugh and Shore, Naval Research Laboratory, 21 January 1976. Kept in C by John A. Wasser, 15 April 1985, who placed it in the public domain.
-- **The throat:** D. H. Klatt, "Software for a cascade/parallel formant synthesizer", *JASA* 67 (1980).
+- **The throat:** D. H. Klatt, "Software for a cascade/parallel formant synthesizer", *J. Acoust. Soc. Am.* 67 (3), 971–995 (1980), [doi:10.1121/1.383940](https://doi.org/10.1121/1.383940).
 - **The vowels:** Peterson and Barney, *JASA* 24 (1952).
 - **Beepages:** after Douglas Engelbart's bips.
 
