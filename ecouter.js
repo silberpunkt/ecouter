@@ -1,5 +1,5 @@
 /* ecouter.js -- a featherlight, instrumented text-to-speech library in one file.
-   Written by repo.make.js on 2026-10-29 from the ecouter workshop; do not edit here.
+   Written by repo.make.js on 2026-11-18 from the ecouter workshop; do not edit here.
 
    What it is: a formant throat after Klatt (1980), five formants, a glottal
    source with life (wobble, waver, flutter, air), a second vent for hisses

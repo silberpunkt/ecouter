@@ -86,8 +86,21 @@ Under Node: `const E = require('./ecouter-speech.js')`, with the same calls. [Th
 | `ecouter-speech.min.js` | the voice alone: English text to speech | 54,710 B | 15.4 KB |
 | `viriditas.min.js` | the colour alone, with no throat | 48,366 B | 13.2 KB |
 | `ecouter.min.js` | everything: voice, colour, and Bell's *Visible Speech* | 76,453 B | 21.1 KB |
+| `ecouter-score.min.js` | a ring beside any of the voices: work on a score before it is sung | 5,063 B | 2.0 KB |
 
 Each has a commented, unshrunk twin without `.min`. The `.min` files only drop comments: newlines and indentation are kept, so they stay readable. Compressed sizes are gzip -9, which is roughly what a web server sends.
+
+**The score ring** is not part of the library, and the library is no heavier for it. Load it after `ecouter.js` or `ecouter-speech.js` and it hangs itself on as `ECOUTER.SCORE`. It fits each word of a sentence to a length you give it, moves the tone, lifts a quoted word, and slides the whole from speech toward song, all in the score, before any sound exists:
+
+```js
+var s = ECOUTER.SCORE.read(["Is", "it", "you"], ["", "", "?"]);
+s = ECOUTER.SCORE.sing(ECOUTER.SCORE.fit(ECOUTER.SCORE.tone(s, 1.03), [180, 150, 420]), 0.5);
+var pcm = ECOUTER.SCORE.say(s);
+```
+
+Under Node, `require('./ecouter-score.js')` hangs it on the whole library; to hang it on another, `require('./ecouter-score.js')(require('./ecouter-speech.js'))`.
+
+It came home from [Obelus](https://github.com/silberpunkt/obelus), which fits a voice to a line of type. The song is Audenare's.
 
 ## What's inside
 
@@ -108,7 +121,7 @@ node test/smoke.js          # the commented files
 node test/smoke.js min      # the .min files
 ```
 
-19 checks, covering all three libraries, in about a third of a second. Under QuickJS: `qjs --std test/smoke.js`.
+22 checks, covering all three libraries and the score ring, in under a second. Under QuickJS: `qjs --std test/smoke.js`.
 
 **The temp cache.** Under Node or QuickJS, Ecouter keeps each gusted sound it makes in `temp-cache/`, in the folder you run from, named by a hash of the sound and its settings. Making the same sound again is then instant. The folder is safe to delete, and git ignores it. To keep nothing on disk, set `ECOUTER.CHAIN.cache = null`. In a web page there is no disk, and no cache.
 

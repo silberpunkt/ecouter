@@ -24,7 +24,7 @@ lips and a governor; a spectrogram gust and its sound; a chain of settings; the 
 Report's 355 letter-to-sound rules, public domain since 1985, and their matcher.</p>
 <p>This page tests all of it at once: the rules read the text, the throat sings it, the chain tunes it, and the wave and
 the picture below are of what you hear. The toggles are the tunings laid on the rough signal; flip one and the text is said again.</p>
-<textarea id="t">Put the book back. How about you?</textarea>
+<textarea id="t">Is it you? It is you! It's not only everyone; it's you, too.</textarea>
 <div class="row"><button id="say">Say</button><button id="stop">Stop</button><button id="save">Save .wav</button><span id="out"></span></div>
 <div class="row" id="toggles" title="The tunings laid on the rough signal, and the tune; each lit is in the chain. Flip one and the text is said again."></div>
 <div class="graph"><canvas id="wave" height="120"></canvas><i class="head" id="h1"></i></div>
@@ -43,14 +43,15 @@ Conduction: The tune. Each sentence begins high, sags a little, and returns to l
 <p class="key">Each sentence is made in its own Web Worker, in parallel. A sentence plays when it and the one before it are done. Where workers cannot start, sentences are made one by one.</p>
 <script src="../ecouter.js"></script>
 <script>
-var SR = ECOUTER.SR, pcm = null, ctx = null, playing = null, startAt = 0;
+var SR = ECOUTER.SR, pcm = null, ctx = null, playing = null, startAt = 0, mute = "";   // mute: what to say when the box has no sound
 var voice = ECOUTER.CHAIN.settings(ECOUTER.CHAIN.PRESETS[ECOUTER.CHAIN.HOUSE_NAME]);   // the house, to begin; then as this browser last had the toggles
 try { var kept = JSON.parse(localStorage.getItem("say.toggles") || "null"); if (kept) Object.keys(kept).forEach(function (k) { if (typeof voice[k] === "boolean") voice[k] = kept[k]; }); } catch (e) {}
 function remember() { try { var o = {}; TOGGLES.forEach(function (tg) { o[tg[0]] = !!voice[tg[0]]; }); localStorage.setItem("say.toggles", JSON.stringify(o)); } catch (e) {} }
-var TOGGLES = [["gust", "Gust"], ["stocking", "Silk Stocking"], ["entone", "Entone"], ["ess", "Ess"], ["govern", "Governor"], ["mellow", "Mellow"], ["conduction", "Conduction"], ["fgl", "4x FGL"]];
+// each with its word of explanation, the same as is written out at the foot of the page, so that it is to hand where the button is (user1, 18 xi 2026)
+var TOGGLES = [["gust", "Gust", "The spectrogram blurred a little and sound-matched."], ["stocking", "Silk Stocking", "A shelf down above 4 kHz."], ["entone", "Entone", "A comb on the score's own pitch."], ["ess", "Ess", "A standard 'de-esser'."], ["govern", "Governor", "Holds what stands above 5.5 kHz within hearing."], ["mellow", "Mellow", "A kind microphone. Highs softened, a small lift below 250 Hz, and the echo of a small room."], ["conduction", "Conduction", "The tune. Each sentence begins high, sags a little, and returns to level. Without it the voice falls a fifth across the whole, and sounds defeated."], ["fgl", "4x FGL", "The fast search of Perraudin (2013). Ten turns with momentum replace forty. Judge by ear."]];
 function $(id) { return document.getElementById(id); }
 TOGGLES.forEach(function (tg) {                      // buttons, lit when in the chain, as the bench has them
-  var b = document.createElement("button"); b.textContent = tg[1]; b.classList.toggle("on", !!voice[tg[0]]);
+  var b = document.createElement("button"); b.textContent = tg[1]; b.title = tg[2]; b.classList.toggle("on", !!voice[tg[0]]);
   b.onclick = function () { voice[tg[0]] = !voice[tg[0]]; b.classList.toggle("on", !!voice[tg[0]]); remember(); if (pcm) say(); };
   $("toggles").appendChild(b);
 });
@@ -97,7 +98,11 @@ function cut(codes) {                                  // "a b . c d ?" -> ["a b
   return out;
 }
 function playPart(n) {                                 // sentence n, then the next when it ends
-  var x = n === 0 ? ECOUTER.lead(made[n]) : made[n]; ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();   // the lead: a third of a second of silence before the first sound of the chain only (user1)
+  var x = n === 0 ? ECOUTER.lead(made[n]) : made[n];   // the lead: a third of a second of silence before the first sound of the chain only (user1)
+  // Two courtesies learned in Obelus (its IOU 1, 15 xi 2026). A box with no sound may refuse to make a context at all (Servo), and one that
+  // makes it may refuse to wake it, with a rejected promise (WebKit says so aloud). Each wants a catch, and the page should say what happened.
+  if (!ctx) { try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { mute = " This browser gave no sound device, so nothing is heard here; Save still writes the sound to a file."; $("out").textContent += mute; return; } }
+  if (ctx.state === "suspended" && ctx.resume) ctx.resume().catch(function () {});
   var b = ctx.createBuffer(1, x.length, SR); b.getChannelData(0).set(x);
   var s = ctx.createBufferSource(); s.buffer = b; s.connect(ctx.destination);
   s.onended = function () { if (playing !== s) return; playing = null; next = n + 1; if (made[next]) playPart(next); else if (next >= parts.length) { setHead(0); } };
@@ -111,7 +116,7 @@ function arrived(n, x, thisRun) {
   if (all) {
     var total = 0, i, at = 0; for (i = 0; i < made.length; i++) total += made[i].length;
     pcm = new Float32Array(total); for (i = 0; i < made.length; i++) { pcm.set(made[i], at); at += made[i].length; }
-    $("out").textContent = parts.join(" ") + " (" + (pcm.length / SR).toFixed(2) + " s, " + parts.length + (parts.length === 1 ? " sentence" : " sentences") + " made in " + (Date.now() - t0) + " ms" + (canWork ? ", in workers" : "") + ")";
+    $("out").textContent = parts.join(" ") + " (" + (pcm.length / SR).toFixed(2) + " s, " + parts.length + (parts.length === 1 ? " sentence" : " sentences") + " made in " + (Date.now() - t0) + " ms" + (canWork ? ", in workers" : "") + ")" + mute;
     drawWave(); drawPic();
   }
 }

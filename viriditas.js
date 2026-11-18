@@ -1,5 +1,5 @@
 /* viriditas.js -- the lamp: text coloured by the tone a voice would give it, in one file.
-   Written by repo.make.js on 2026-10-29 from the ecouter workshop; do not edit here.
+   Written by repo.make.js on 2026-11-18 from the ecouter workshop; do not edit here.
 
    Viriditas tints; its sister ecouter.js speaks. This file has no throat: it holds the 41
    phoneme codes of NRL Report 7948, the Report's 355 letter-to-sound rules (public domain,

@@ -42,5 +42,14 @@ t('ecouter-speech loads, with no sheets and no lamp', !!S && typeof S.say === 'f
 t('and reads as the whole library reads', S.codes('Put the book back.') === E.codes('Put the book back.'), S.codes('Put the book back.'));
 var sp = S.say('Put the book back.', { turns: 2 });
 t('and speaks the same length', sp.length === pcm.length, (sp.length / S.SR).toFixed(2) + ' s');
+var RFILE = FILE === 'ecouter.min.js' ? 'ecouter-score.min.js' : 'ecouter-score.js';   // the score ring: a file beside the library, hung on whichever library is loaded
+if (typeof require !== 'function') std.loadScript(scriptArgs[0].split('/').slice(0, -2).concat([RFILE]).join('/') || RFILE); else require('../' + RFILE)(E);   // in node it is hung on the library under test, by hand
+var RL = typeof require === 'function' ? E : S, R = RL.SCORE;
+t('the score ring loads beside the library', !!R && typeof R.fit === 'function' && typeof R.sing === 'function');
+var sc0 = R.read(['Is', 'it', 'you'], ['', '', '?']), sc = R.sing(R.fit(R.tone(sc0, 1.03), [200, 200, 500]), 0.5), lasts = 0;
+sc.frames.forEach(function (f) { lasts += f.ms; });
+t('a score read, toned, fitted and sung lasts what it was fitted to', Math.abs(lasts - 900) < 1e-6 && sc0.frames !== sc.frames, lasts.toFixed(3) + ' ms');
+var rp = R.say(sc, { turns: 2 });
+t('and the throat sings it', rp.length > 12000 && rp.length < 20000, (rp.length / RL.SR).toFixed(2) + ' s');
 print(ok + ' passed, ' + bad + ' failed');
 if (typeof process !== 'undefined') process.exitCode = bad ? 1 : 0;

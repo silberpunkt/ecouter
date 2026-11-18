@@ -123,7 +123,10 @@ function headLoop() {
   requestAnimationFrame(headLoop);
 }
 $("say").onclick = function () {
-  tint(); var pcm = ECOUTER.say($("t").value); ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+  tint(); var pcm = ECOUTER.say($("t").value);
+  // the two courtesies of say.html: a box with no sound may refuse to make a context, or to wake one. The colours are shown either way.
+  if (!ctx) { try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; } }
+  if (ctx.state === "suspended" && ctx.resume) ctx.resume().catch(function () {});
   if (playing) { try { playing.onended = null; playing.stop(); } catch (e) {} playing = null; }
   pcm = ECOUTER.lead(pcm);                           // the lead: a third of a second of silence first (user1)
   var b = ctx.createBuffer(1, pcm.length, ECOUTER.SR); b.getChannelData(0).set(pcm);

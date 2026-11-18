@@ -118,7 +118,10 @@
   document.getElementById('draw').onclick = draw;
   [].forEach.call(document.querySelectorAll('#modes button'), function (b) { b.onclick = function () { MODE = b.getAttribute('data-mode'); draw(); }; });
   document.getElementById('hear').onclick = function () {
-    if (!pcm) draw(); ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    if (!pcm) draw();
+    // the two courtesies of say.html: a box with no sound may refuse to make a context, or to wake one. The drawing stands either way.
+    if (!ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; } }
+    if (ac.state === "suspended" && ac.resume) ac.resume().catch(function () {});
     var b = ac.createBuffer(1, pcm.length, sr); b.getChannelData(0).set(pcm); var s = ac.createBufferSource(); s.buffer = b; s.connect(ac.destination); s.start();
   };
   draw();
