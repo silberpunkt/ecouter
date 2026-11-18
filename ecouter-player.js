@@ -176,15 +176,17 @@
   }
 
   /* HEADROOM. What Ecouter makes stands at nine tenths of full scale. Resound lifts the chest of the voice and adds a
-     return, and the two together were measured (18 xi 2026, four voices) to raise the peak by as much as a third: at
-     full volume that is clipped at the loudspeaker. So a player opens at Obelus's volume, 0.8, which leaves the room
-     its room. p.volume(v) changes it. */
-  var VOLUME = 0.8;
+     return, and the two together raise the peak: measured 18 xi 2026 over all eight voices on one sentence, by 23 in
+     the hundred at the least (Miria) and 46 at the most (Nuage). At full volume that is clipped at the loudspeaker,
+     and clipping is a discontinuity that speech in a room does not have. So a player opens at 0.72, where the
+     loudest of the eight stood at 0.95. (The first measure took four voices, found a third, and chose Obelus's own
+     0.8; Phillippe, Arthur and Nuage then clipped a little.) p.volume(v) changes it. */
+  var VOLUME = 0.72;
 
   /* OPEN: a player, in a page. It never throws. A box with no sound device may refuse to make a context at all (Servo),
      and one that makes it may refuse to wake it (WebKit says so aloud): then the player is there, does nothing, and
      says so: p.silent is true. o.context: a context of your own; o.resound: begin with the room (true);
-     o.end: 'stop', 'through' or 'reflect'; o.volume: 0.8 unless said; o.worklet: false to keep the head off the audio thread (only to hear why
+     o.end: 'stop', 'through' or 'reflect'; o.volume: 0.72 unless said; o.worklet: false to keep the head off the audio thread (only to hear why
      not). p.output is the last node before the loudspeaker, for whoever would draw the sound. */
   function open(o) {
     o = o || {};

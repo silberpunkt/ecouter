@@ -113,7 +113,7 @@ Three things about that head are worth knowing, whoever writes it. It **never ju
 
 **A room belongs after the head.** Ecouter's own `mellow` lays a little room into the sound, which is right for a sound played whole. A sound that is dragged or run backward drags whatever is on it, and a room played backward is heard as one. So for a voice that is scrubbed, put the room after the head, as filters in the page: it is then the air about the machine, and stays still. The player ring's Resound is such a room: a peak of 3 dB at 170 Hz, a shelf of 2 dB down above 4.2 kHz, and a scattered return that begins 12 ms after the voice, is gone in a quarter of a second, and lies 11.8 dB under it.
 
-**Leave the room its room.** What Ecouter makes stands at nine tenths of full scale. A lift and a return added after it raise the peak: measured over four voices, by as much as a third, which at full volume is clipped at the loudspeaker. The player opens at a volume of 0.8 for that reason, and the peak then stood at 0.96.
+**Leave the room its room.** What Ecouter makes stands at nine tenths of full scale. A lift and a return added after it raise the peak: measured over all eight voices on one sentence, by a quarter at the least and nearly a half at the most, which at full volume is clipped at the loudspeaker. The player opens at a volume of 0.72 for that reason, and the loudest of the eight then stood at 0.95. (A first measure, over four voices, found a third and chose 0.8; three of the other four then clipped a little.)
 
 **What was tried, 18 November 2026.** The three example pages, each opened and pressed:
 

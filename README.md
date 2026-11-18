@@ -86,8 +86,8 @@ Under Node: `const E = require('./ecouter-speech.js')`, with the same calls. [Th
 | `ecouter-speech.min.js` | the voice alone: English text to speech | 54,710 B | 15.4 KB |
 | `viriditas.min.js` | the colour alone, with no throat | 48,366 B | 13.2 KB |
 | `ecouter.min.js` | everything: voice, colour, and Bell's *Visible Speech* | 76,453 B | 21.1 KB |
-| `ecouter-score.min.js` | a ring beside the library: work on a score before it is sung, and the voices by name | 10,637 B | 3.9 KB |
-| `ecouter-player.min.js` | a second ring: a tape, a head that does not pop, the speed of the tape, and a room | 13,562 B | 4.7 KB |
+| `ecouter-score.min.js` | a ring beside the library: work on a score before it is sung, and the voices by name | 10,651 B | 3.9 KB |
+| `ecouter-player.min.js` | a second ring: a tape, a head that does not pop, the speed of the tape, and a room | 13,563 B | 4.7 KB |
 
 Each has a commented, unshrunk twin without `.min`. The `.min` files only drop comments: newlines and indentation are kept, so they stay readable. Compressed sizes are gzip -9, which is roughly what a web server sends.
 

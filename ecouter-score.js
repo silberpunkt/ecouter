@@ -74,7 +74,7 @@
       codes.push(' '); word.push(j);
       if (punct[j]) { codes.push(punct[j]); word.push(j); codes.push(' '); word.push(j); }
     }
-    return { codes: codes, word: word, frames: P.frames(codes, { f0: o.f0 || 118 }) };
+    return { codes: codes, word: word, frames: P.frames(codes, { f0: o.f0 || 118, tune: o.tune }) };   // o.tune: 'conduction' unless said; 'apology' is the voice without its tune
   }
 
   /* TONE (user1: "Tone and Speed controls would be ideal... little or no impact on the engine"). The tape itself

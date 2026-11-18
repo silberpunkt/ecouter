@@ -90,7 +90,7 @@ function stop() { if (playing) { try { playing.onended = null; playing.stop(); }
 // SAYING, A SENTENCE AT A TIME (user1, 11 x 2026: "a new Web worker per sentence, to be played when the one playing is
 // done"). The codes are cut at the marks the Lexillogue keeps; each sentence goes to a worker of its own; sentence n is
 // played when it is back and sentence n-1 has ended; the wave and the picture are drawn when all are back.
-var run = 0, parts = [], made = [], next = 0, t0 = 0, canWork = typeof Worker === "function";
+var run = 0, parts = [], made = [], next = 0, t0 = 0, canWork = typeof Worker === "function" && location.protocol !== "file:";   // a page opened from a file may not start a worker from a file beside it, and the browser says so in its console; there the page does not try
 function cut(codes) {                                  // "a b . c d ?" -> ["a b .", "c d ?"]
   var out = [], cur = [], bits = codes.trim().split(" "), i;
   for (i = 0; i < bits.length; i++) { if (!bits[i]) continue; cur.push(bits[i]); if (bits[i] === "." || bits[i] === "?" || bits[i] === "!") { out.push(cur.join(" ")); cur = []; } }

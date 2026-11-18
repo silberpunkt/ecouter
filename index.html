@@ -1,6 +1,413 @@
 <!doctype html>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ecouter</title>
-<meta http-equiv="refresh" content="0; url=examples/proof.html">
-<link rel="canonical" href="examples/proof.html">
-<p>See <a href="examples/proof.html">the proof</a>, <a href="examples/tint.html">tint any text</a>, <a href="examples/say.html">hear Ecouter speak</a>, or <a href="examples/tape.html">drag its voice like a tape</a>.</p>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 15'%3E%3Cstyle%3Epath%7Bstroke:%23222%7D@media(prefers-color-scheme:dark)%7Bpath%7Bstroke:%23e8e8e8%7D%7D%3C/style%3E%3Cpath d='M1.5 1.5H24.5A11.5 11.5 0 0 1 1.5 1.5Z' fill='none' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+  /* THE LIGHTS, as the tint workbench has them: three, as variables; each also gives the lamp its base ink and its guard */
+  body { --bg: #000; --ink: #e8e8e8; --dim: #9a9a9a; --line: #555; --pane: #000; --btn: #1a1a1a; --edge: #777; --on: #fff; --mark: #f0a437 }
+  body.day { --bg: #f7f7f5; --ink: #222; --dim: #555; --line: #c8c8c8; --pane: #fff; --btn: #e4ecff; --edge: #1f5f99; --on: #a8590a; --mark: #a8590a }
+  body.dusk { --bg: #2a2a2e; --ink: #c4c4c0; --dim: #8a8a88; --line: #44444a; --pane: #222226; --btn: #2c3a5c; --edge: #6d86b8; --on: #d9a85a; --mark: #d9a85a }
+  body.night { --bg: #000; --ink: #e8e8e8; --dim: #9a9a9a; --line: #555; --pane: #000; --btn: #1a1a1a; --edge: #777; --on: #fff; --mark: #f0a437 }
+  /* the signs as text glyphs, not color pictures; and where a browser draws a picture anyway, it is smashed to grey */
+  button i, dt i { font-style: normal; font-family: "Segoe UI Symbol", "Noto Sans Symbols2", "Symbola", sans-serif; font-variant-emoji: text; filter: grayscale(1) brightness(1.2) contrast(1.6) }
+  body { font: 15px/1.45 Iosevka, Consolas, monospace; margin: 20px auto 40px; max-width: 860px; padding: 0 16px; background: var(--bg); color: var(--ink) }
+  h1 { font-size: 20px; letter-spacing: 0.18em; margin: 0 8px 0 0; display: flex; align-items: center; gap: 10px } .logo { flex: none; display: block }
+  select { font: inherit; color: var(--ink); background: var(--btn); border: 1px solid var(--edge); border-radius: 2px; padding: 3px 6px; cursor: pointer } option { background: var(--pane); color: var(--ink) } h2 { font-size: 15px; margin: 16px 0 2px; color: var(--ink) } p { margin: 6px 0; color: var(--dim) }
+  a { color: var(--edge) }
+  body { --sample: 31px }
+  textarea { width: 100%; height: calc(var(--sample) * 3.2 + 26px); box-sizing: border-box; font: inherit; font-size: var(--sample); line-height: 1.6; background: var(--pane); color: var(--ink); border: 1px solid var(--line); padding: 12px 16px; margin-top: 8px; display: block }
+  #lit { font-size: var(--sample); line-height: 1.6; white-space: pre-wrap; background: var(--pane); padding: 12px 16px; border: 1px solid var(--line); border-top: 0; min-height: 2.6em; --glow: 1 }
+  #lit span[style*="--room"] { background: rgb(var(--room) / calc(var(--ra) * var(--glow))) }
+  #lit:focus { outline: 1px solid var(--edge) }
+  .w.done { box-shadow: 1px 0 0 var(--dim) }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0 } .gap { flex: 1 1 auto } .lbl { color: var(--dim) }
+  button { font: inherit; color: var(--ink); background: var(--btn); border: 1px solid var(--edge); border-radius: 2px; padding: 3px 12px; cursor: pointer }
+  button.on { border-color: var(--mark); color: var(--mark) } button:disabled { opacity: 0.4; cursor: default }
+  .seg { display: inline-flex; flex-wrap: wrap; gap: 0 } .seg button { border-radius: 0; margin-left: -1px } .seg button:first-child { border-radius: 2px 0 0 2px; margin-left: 0 } .seg button:last-child { border-radius: 0 2px 2px 0 } .seg button.on { position: relative; z-index: 1 }
+  label { color: var(--dim) } label input[type=number] { width: 60px; font: inherit; background: var(--pane); color: var(--ink); border: 1px solid var(--line); margin-left: 4px }
+  input[type=range] { accent-color: var(--mark); vertical-align: middle }
+  .dials label { display: inline-flex; align-items: center; gap: 6px } .dials input { width: 110px } .dials b { display: inline-block; min-width: 2.6em; color: var(--ink); font-weight: normal }
+  #toggles.off button { opacity: 0.45 }
+  #out { color: var(--dim); font-size: 13px; word-break: break-word; min-height: 1.4em }
+  #ph { width: 100%; margin: 4px 0 0; display: block }
+  .graph { position: relative; margin-top: 6px; touch-action: none; cursor: grab; border: 1px solid var(--line) } .graph.held { cursor: grabbing }
+  canvas { display: block; width: 100%; background: #000 } #wave { height: 110px } #spec { height: 200px }
+  /* BY DAY the two pictures are turned to the light (user1, 18 xi 2026), and not by a clean half turn of the wheel: "A perfect flip
+     inverts the color wheel, whose lobes consettle differently than one would expect. A modest kick restores comparability... Eyes
+     say it's so." The numbers are his. */
+  body.day #spec { filter: invert() hue-rotate(192deg) brightness(0.9) saturate(1.4) contrast(1.2) }
+  body.day #wave { filter: invert() hue-rotate(192deg) brightness(1.4) }
+  .head { position: absolute; top: 0; bottom: 0; left: 0; border-left: 1px solid #f05858; pointer-events: none }
+  .panel { border: 1px solid var(--line); background: var(--pane); padding: 10px 16px 12px; margin: 10px 0 }
+  .panel .row { margin: 0 0 4px } .panel h2 { margin: 0 }
+  dl.secs { display: grid; grid-template-columns: 2.2em 1fr; gap: 8px 10px; margin: 6px 0 0 } dl.secs dt { text-align: center; font-size: 1.25em; line-height: 1.2; color: var(--ink) } dl.secs dd { margin: 0; color: var(--dim) } dl.secs dd b { color: var(--ink); font-weight: 600 }
+  p.key { margin-top: 10px; font-size: 13px }
+</style>
+<div class="row"><h1><svg class="logo" width="26" height="15" viewBox="0 0 26 15" aria-hidden="true"><path d="M1.5 1.5H24.5A11.5 11.5 0 0 1 1.5 1.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>ECOUTER</h1><button id="b-about" title="What Ecouter is, and what this page is made of."><i>&#x2139;&#xFE0E;</i> About</button><button id="b-howto" title="How to use this page."><i>&#x2637;&#xFE0E;</i> Howto</button><span class="gap"></span><span class="lbl">Theme:</span><span class="lights seg"><button data-light="day" title="The normal state of all applications and websites in the past."><i>&#x2600;&#xFE0E;</i> Day</button><button data-light="dusk" title="Dark mode. Diminished contrast, much diminished flux."><i>&#x25D0;&#xFE0E;</i> Dusk</button><button data-light="night" class="on" title="Black and white, with grey lines."><i>&#x263D;&#xFE0E;</i> Night</button></span><span class="lbl">Sample:</span><span class="seg"><button id="smaller" title="The words smaller, in both boxes.">-</button><button id="larger" title="The words larger, in both boxes.">+</button></span></div>
+
+<div id="about" class="panel" hidden>
+<div class="row"><h2>About</h2><span class="gap"></span><button class="x" title="Close.">X</button></div>
+<dl class="secs">
+<dt><i>&#x1F4A1;&#xFE0E;</i></dt><dd><b>What it is.</b> Ecouter is a tiny English text-to-speech in one file. It was built to color text by the tone a voice would give it, once looked up. It does not have to sound out, but it can, rather well.</dd>
+<dt><i>&#x1F4D6;&#xFE0E;</i></dt><dd><b>How it reads.</b> By the 355 letter-to-sound rules of NRL Report 7948 (1976), which have been public since 1985. The sentence is given a tune, and a small formant throat sings it. Nothing is recorded and nothing is looked up elsewhere.</dd>
+<dt><i>&#x1F3A8;&#xFE0E;</i></dt><dd><b>The color.</b> Each letter takes the color of the tone the voice would give it. Flat is green. A question lifts toward blue, an exclamation drops toward red. The same text gives the same colors every time.</dd>
+<dt><i>&#x25CE;&#xFE0E;</i></dt><dd><b>The rings.</b> The library is the pearl: English in, samples out. About it are rings, each a small file of its own. The score ring works on a sentence before it is sung, and holds the voices by name. The player ring treats the sound as a tape, and reads it with a head. This page uses all three.</dd>
+<dt><i>&#x1F512;&#xFE0E;</i></dt><dd><b>What it keeps.</b> Your choices and your words, in this browser and nowhere else, so that they are here when you come back. Nothing is sent anywhere, and everything is made in your browser. Reset puts the choices back as they first were, and leaves your words alone.</dd>
+<dt><i>&#x1F517;&#xFE0E;</i></dt><dd><b>More.</b> <a href="examples/proof.html">The proof</a> that the colors are the pitch. <a href="examples/tint.html">The tint workbench</a>. <a href="examples/say.html">Say</a>, with the wave and the spectrogram. <a href="examples/tape.html">Tape</a>, the player alone. And <a id="repo" href="https://github.com/silberpunkt/ecouter#readme">the source, with its notes</a>.</dd>
+</dl>
+</div>
+
+<div id="howto" class="panel" hidden>
+<div class="row"><h2>Howto</h2><span class="gap"></span><button class="x" title="Close.">X</button></div>
+<dl class="secs">
+<dt><i>&#x2328;&#xFE0E;</i></dt><dd><b>Write.</b> Type in either box, or choose a Text Sample. The lower box colors as you type. Sample - and + size the words in both.</dd>
+<dt><i>&#x1F3A8;&#xFE0E;</i></dt><dd><b>Color.</b> Choose a tint. Omnia spreads the voice's range over the whole wheel. Viriditas is the quiet reading mode and stays near green. Vivificat is between. A background lights the room behind the letters.</dd>
+<dt><i>&#x1F5E3;&#xFE0E;</i></dt><dd><b>Choose a voice.</b> Each is Ecouter, differently carried, and opens on its own four dials. Move them as you like. Voice's own puts them back.</dd>
+<dt><i>&#x25B6;&#xFE0E;</i></dt><dd><b>Say.</b> The text is sung and played. Speed can be moved while it plays. The other dials sing it again.</dd>
+<dt><i>&#x270B;&#xFE0E;</i></dt><dd><b>Take hold.</b> Drag the playhead, the wave or the spectrogram. The voice goes with your hand, backward too.</dd>
+<dt><i>&#x2702;&#xFE0E;</i></dt><dd><b>Take it apart.</b> The finish is eight parts. Turn them off one by one and hear what the sound is at heart. It tries. It is basic.</dd>
+<dt><i>&#x1F4BE;&#xFE0E;</i></dt><dd><b>Save.</b> A .wav of the tape, at the speed set. The room after the head is not in it.</dd>
+</dl>
+</div>
+
+<div class="row" style="margin-bottom:0"><label class="lbl" for="sample">Text Sample:</label><select id="sample" title="A passage to try, short or long. Your own words go in the box below."></select></div>
+<textarea id="t" spellcheck="false">Is it you? It is you! It's not only everyone; it's you, too.</textarea>
+<div id="lit" contenteditable="true" spellcheck="false" title="The same line, each letter in the color of its pitch. Type here too."></div>
+
+<h2>Coloring choices</h2>
+<div class="row"><span class="lbl">Tint:</span><span class="modes seg"><button data-mode="none" title="The text as it is, to compare in place.">None</button><button data-mode="viriditas" title="Green at rest. One turn of the wheel an octave, mixed into white."><i>&#x1F333;&#xFE0E;</i> Viriditas</button><button data-mode="omnia" class="on" title="The same tilts told over the whole wheel. The mix goes all the way to color."><i>&#x1F3A8;&#xFE0E;</i> Omnia</button><button data-mode="vivificat" title="A blend of both, leaning to Omnia by 62 hundredths."><i>&#x1F58C;&#xFE0E;</i> Vivificat</button></span></div>
+<div class="row"><span class="lbl">Background:</span><span class="rooms seg"><button data-room="none" title="No background.">None</button><button data-room="close" title="A small, intimate room. A shul for whispers.">Close</button><button data-room="normal" class="on" title="The room as proposed. The tune's trailing average, lit by the voice's ring.">Normal</button><button data-room="royal" title="The stone hall of Elizabeth R.">Royal</button></span><label>Glow <input id="glow" type="range" min="0" max="3" step="0.1" value="0.8" title="How visible the room is."></label></div>
+<div class="row"><label>Mix: <input id="mix" type="number" min="0" max="1" step="0.05" value="0.75" title="How far a full tilt leaves the ink for its color."></label><label>Full coloring at: <input id="full" type="number" min="0.025" max="1" step="0.025" value="0.125" title="Octaves from flat at which a letter reaches full color."> octaves from flat to full color.</label><button id="auto" title="Flat becomes the text's own median pitch, and its widest tilt fills the color.">Auto</button></div>
+
+<h2>Voice choices</h2>
+<div class="row" id="voicerow"><span class="lbl">Voice:</span><span class="seg" id="voices"></span></div>
+<div class="row dials" id="dials"></div>
+<div class="row"><span class="lbl">Softening:</span><button id="finish" class="on" title="The house finish: the eight parts below, as they are set. Off, the voice is the rough signal as the throat makes it.">Finish</button><span class="lbl">Presence:</span><button id="resound" class="on" title="A small room after the head: a lift at the chest of the voice, a little taken from the top, and a short scattered return. It is not on the tape, so it stays still when the tape is dragged.">Resound</button></div>
+<div class="row" id="toggles" title="The finish, part by part. Each lit is in the chain."><span class="lbl">Finishes:</span></div>
+<div class="row"><span class="lbl">Reset choices:</span><button id="reset" title="Every choice on this page put back as it first was: theme, size, coloring, voices and their dials, the finish. Your words are left alone.">Reset</button></div>
+
+<h2>Playback</h2>
+<div class="row"><button id="say" title="Sing the text in this voice and play it from the start."><i>&#x25B6;&#xFE0E;</i> Say</button><button id="stop" title="Rest the head where it is."><i>&#x25A0;&#xFE0E;</i> Stop</button><button id="save" title="The tape as it would be heard at this speed, written to a .wav file. The room after the head is not in it."><i>&#x1F4BE;&#xFE0E;</i> Save</button><span id="out"></span></div>
+<input id="ph" type="range" min="0" max="1000" step="1" value="0" title="The playhead. Drag it and the voice goes with it.">
+<div class="graph" id="g1" title="The tape: the sound as a strip. Take hold of it and drag."><canvas id="wave" height="110"></canvas><i class="head"></i></div>
+<div class="graph" id="g2" title="The spectrogram of the sound, with the pitch of the score drawn over it in its own color. Take hold of it and drag."><canvas id="spec" height="200"></canvas><i class="head"></i></div>
+<p class="key">Two views of one sound, on one clock: the wave, then its spectrogram, low at the foot. The grey is the sound itself. The colored lines are the pitch the score asked for, on the fundamental and its first two harmonics. They lie on the grey bands because they are the same pitch.</p>
+
+<script src="ecouter.js"></script>
+<script src="ecouter-score.js"></script>
+<script src="ecouter-player.js"></script>
+<script src="index.worker.js"></script>
+<script>
+// ECOUTER'S FRONT PAGE (18 xi 2026), after user1's sketch of that day: "Ecouter as I know it. Built to color text based on
+// its given tone, once looked up. Does not have to sound out, but can, rather well." From the top down it is the rings in
+// order: the pearl (the text and its tint), the score (the voices and their dials), the player (the tape and its head),
+// and the seeing (the wave and the spectrogram). The coloring is the tint workbench's; the finish row is say.html's; the
+// tape is tape.html's; the spectrogram is drawn as proof.html draws it. What is set here is kept in this browser, and nowhere else.
+var E = ECOUTER, S = E.SCORE, PL = E.PLAYER, SR = E.SR;
+function $(id) { return document.getElementById(id); }
+function each(sel, f) { [].forEach.call(document.querySelectorAll(sel), f); }
+(function () { var m = location.hostname.match(/^([^.]+)\.github\.io$/), seg = location.pathname.split("/")[1]; if (m && seg) $("repo").href = "https://github.com/" + m[1] + "/" + seg + "#readme"; })();
+
+// ---------- About and Howto ----------
+function panel(name) { ["about", "howto"].forEach(function (n) { var open = n === name && $(n).hidden; $(n).hidden = !open; $("b-" + n).classList.toggle("on", open); }); }
+$("b-about").onclick = function () { panel("about"); }; $("b-howto").onclick = function () { panel("howto"); };
+each(".panel .x", function (b) { b.onclick = function () { panel(""); }; });
+
+// THE SAMPLE (user1, 18 xi 2026: "the words must be adjustable in size, both before and after, because we are encouraging people
+// to see the difference between Mandatory Monotone and Evidentiary Color"). One size for both boxes, a step at a time.
+var SIZES = [13, 15, 17, 19, 22, 26, 31, 37, 44, 53, 64], size = 6;     // it opens three steps up from the size of the page (user1: "Seeing the sample large was a revelation")
+function sample(d) { size = Math.max(0, Math.min(SIZES.length - 1, size + d)); document.body.style.setProperty("--sample", SIZES[size] + "px"); $("smaller").disabled = size === 0; $("larger").disabled = size === SIZES.length - 1; }
+$("smaller").onclick = function () { sample(-1); }; $("larger").onclick = function () { sample(1); }; sample(0);
+
+// ---------- the pearl: the text, and its tint ----------
+// THE GLOW. On the tint workbench each light brings a glow of its own (0.4 by day, 1.2 at dusk, 1.8 by night). Here the room is
+// lit from the start, Normal, and user1 set its glow by eye, 18 xi 2026: 0.8 by day, and by night "it becomes as visible as it is
+// in Day at the value of 1.2". Dusk he did not give; it stands between them until he does. A glow the user moves is kept for that light.
+var LIGHTS = { day: { base: [34, 34, 34], ceiling: 0.5, glow: 0.8, lift: 0 }, dusk: { base: [196, 196, 192], floor: 0.42, glow: 1.0, lift: 0.2 }, night: { base: [232, 232, 232], floor: 0.6, glow: 1.2, lift: 0.3 } };
+var light = "night", mode = "omnia", roomName = "normal", glows = {}, ws = [];
+function tint() {
+  var L = LIGHTS[light], opts = { mix: +$("mix").value || 0, full: +$("full").value || 0.125, words: true, auto: $("auto").classList.contains("on"), mode: mode, white: L.base, room: roomName };
+  if (L.floor !== undefined) opts.floor = L.floor; if (L.ceiling !== undefined) opts.ceiling = L.ceiling; opts.roomLift = L.lift;
+  $("lit").innerHTML = E.html($("t").value, opts); ws = $("lit").querySelectorAll(".w");
+}
+function glow(e) { if (e) glows[light] = $("glow").value; $("lit").style.setProperty("--glow", $("glow").value); }     // moved by a hand, it is that light's glow from then on
+function setLight(name) {
+  light = LIGHTS[name] ? name : "night"; document.body.className = light;
+  each(".lights button", function (b) { b.classList.toggle("on", b.getAttribute("data-light") === light); });
+  $("glow").value = glows[light] === undefined ? LIGHTS[light].glow : glows[light]; glow(); tint();   // each light brings its own glow
+}
+each(".lights button", function (b) { b.onclick = function () { setLight(b.getAttribute("data-light")); }; });
+["input", "change"].forEach(function (ev) { $("glow").addEventListener(ev, glow); $("mix").addEventListener(ev, tint); $("full").addEventListener(ev, function () { tint(); drawSpec(); }); });
+each(".rooms button", function (b) { b.onclick = function () { roomName = b.getAttribute("data-room"); each(".rooms button", function (x) { x.classList.toggle("on", x === b); }); tint(); }; });
+each(".modes button", function (b) { b.onclick = function () { mode = b.getAttribute("data-mode"); each(".modes button", function (x) { x.classList.toggle("on", x === b); }); tint(); drawSpec(); }; });
+$("auto").onclick = function () { this.classList.toggle("on"); tint(); };
+$("t").addEventListener("input", tint);
+// typing in the tinted pane, as the tint workbench allows it: each keystroke tints again, and the caret is put back by count
+function caretAt() { var sel = window.getSelection(); if (!sel.rangeCount) return -1; var r = sel.getRangeAt(0), pre = r.cloneRange(); pre.selectNodeContents($("lit")); pre.setEnd(r.endContainer, r.endOffset); return pre.toString().length; }
+function putCaret(n) {
+  var lit = $("lit"), walker = document.createTreeWalker(lit, NodeFilter.SHOW_TEXT), node, seen = 0, sel = window.getSelection(), r = document.createRange();
+  while ((node = walker.nextNode())) { if (seen + node.length >= n) { r.setStart(node, n - seen); r.collapse(true); sel.removeAllRanges(); sel.addRange(r); return; } seen += node.length; }
+  r.selectNodeContents(lit); r.collapse(false); sel.removeAllRanges(); sel.addRange(r);
+}
+$("lit").addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); document.execCommand("insertText", false, String.fromCharCode(10)); } });
+$("lit").addEventListener("input", function () { var n = caretAt(); $("t").value = $("lit").textContent; tint(); if (n >= 0) putCaret(n); });
+
+// ---------- the score: the voices, and their dials ----------
+var ORDER = ["phillippe", "blando", "arthur", "obelus", "rudolf", "nuage", "lauren", "miria"].filter(function (n) { return S.VOICES.names.indexOf(n) >= 0; });
+S.VOICES.names.forEach(function (n) { if (ORDER.indexOf(n) < 0) ORDER.push(n); });
+var DIALS = [["tone", "Tone", 0.7, 1.3, "The tape itself transposed: pitch and throat together. Sings again."], ["speed", "Speed", 0.5, 1.5, "The speed of the tape: pace and pitch together. It is the player's, and can be moved while it plays."],
+  ["song", "Song", 0, 1, "From speech toward song: each syllable drawn toward a held note of a gapped scale. Sings again."], ["steady", "Steady", 0, 1, "How much of the steady ruler is mixed with the living voice. Sings again."]];
+var voiceName = ORDER[0], PER = {}, dials = own(voiceName), finish = true, resound = true;
+function own(n) { var v = S.VOICES.get(n); return { tone: v.tone, speed: v.speed, song: v.song, steady: v.steady }; }
+function showDials() { DIALS.forEach(function (d) { $("d-" + d[0]).value = dials[d[0]]; $("v-" + d[0]).textContent = (+dials[d[0]]).toFixed(2); }); }
+ORDER.forEach(function (n) {
+  var v = S.VOICES.get(n), b = document.createElement("button"); b.textContent = n.charAt(0).toUpperCase() + n.slice(1); b.title = v.says; b.setAttribute("data-voice", n); b.classList.toggle("on", n === voiceName);
+  b.onclick = function () {       // what a voice remembers: its dials as they were left, while the page is open
+    PER[voiceName] = dials; voiceName = n; dials = PER[n] || own(n); each("#voices button", function (x) { x.classList.toggle("on", x === b); });
+    showDials(); if (p) p.pace(dials.speed); changed();
+  };
+  $("voices").appendChild(b);
+});
+DIALS.forEach(function (d) {
+  var l = document.createElement("label"), r = document.createElement("input"), v = document.createElement("b");
+  l.title = d[4]; l.appendChild(document.createTextNode(d[1])); r.type = "range"; r.min = d[2]; r.max = d[3]; r.step = 0.01; r.id = "d-" + d[0]; v.id = "v-" + d[0]; l.appendChild(r); l.appendChild(v);
+  r.addEventListener("input", function () { dials[d[0]] = +r.value; v.textContent = (+r.value).toFixed(2); if (d[0] === "speed" && p) p.pace(dials.speed); });
+  r.addEventListener("change", function () { if (d[0] !== "speed") changed(); });
+  $("dials").appendChild(l);
+});
+(function () { var b = document.createElement("button"); b.id = "own"; b.textContent = "Voice's own"; b.title = "Put this voice's four dials back as Ecouter has them.";
+  b.onclick = function () { dials = own(voiceName); showDials(); if (p) p.pace(dials.speed); changed(); }; $("voicerow").appendChild(b); })();
+showDials();
+// THE FINISH, PART BY PART (user1, 18 xi 2026: "the button-row in Say is an evolutionary choicemap which defines basic Ecouter,
+// hard won by many tests... Turn off all the buttons in order and see what sound is at heart. It tries. It is basic.")
+var TOGGLES = [["gust", "Gust", "The spectrogram blurred a little and sound-matched."], ["stocking", "Silk Stocking", "A shelf down above 4 kHz."], ["entone", "Entone", "A comb on the score's own pitch."], ["ess", "Ess", "A standard 'de-esser'."], ["govern", "Governor", "Holds what stands above 5.5 kHz within hearing."], ["mellow", "Mellow", "A kind microphone. Highs softened, a small lift below 250 Hz, and the echo of a small room. This room is on the tape."], ["conduction", "Conduction", "The tune. Each sentence begins high, sags a little, and returns to level. Without it the voice falls a fifth across the whole, and sounds defeated."], ["fgl", "4x FGL", "The fast search of Perraudin (2013). Ten turns with momentum replace forty. Judge by ear."]];
+var chain = E.CHAIN.settings(E.CHAIN.PRESETS[E.CHAIN.HOUSE_NAME]);
+TOGGLES.forEach(function (tg) {
+  var b = document.createElement("button"); b.textContent = tg[1]; b.title = tg[2]; b.setAttribute("data-part", tg[0]); b.classList.toggle("on", !!chain[tg[0]]);
+  b.onclick = function () { chain[tg[0]] = !chain[tg[0]]; b.classList.toggle("on", !!chain[tg[0]]); changed(); };
+  $("toggles").appendChild(b);
+});
+function chainNow() {     // with Finish off the voice is the rough signal; the tune is not a finish, and stays as it is set
+  var st = E.CHAIN.settings(chain); if (!finish) TOGGLES.forEach(function (tg) { if (tg[0] !== "conduction") st[tg[0]] = false; }); return st;
+}
+$("finish").onclick = function () { finish = !finish; this.classList.toggle("on", finish); $("toggles").classList.toggle("off", !finish); changed(); };
+$("resound").onclick = function () { resound = !resound; this.classList.toggle("on", resound); if (p) p.resound(resound); };
+
+// ---------- the player: the tape, and its head ----------
+var p = null, tape = null, whole = null, madeKey = "", run = 0, canWork = typeof Worker === "function" && location.protocol !== "file:", looping = false, held = false, wasOn = false, note = "", how = "";
+var lineF = null, lineV = null, words = [], specImg = null, specTop = 640, home = 118;
+function player() {       // made on the first press: a browser will not start sound until the person has pressed something
+  if (!p) { p = PL.open({ resound: resound }); p.speed = dials.speed; p.onend = function () { drawHead(); status(); };
+    if (p.silent) note = " This browser gave no sound device, so nothing is heard here; the pictures are still drawn, and Save still writes the sound to a file.";
+    if (tape) p.load(tape); }
+  p.wake(); return p;
+}
+// the text, as sentences of words, the marks that follow them, and whether each stands inside quotation marks
+function sentences(text) {
+  var out = [], cur = { words: [], punct: [], quote: [] }, re = /([A-Za-z0-9][A-Za-z0-9'’-]*)|([.,;:?!])|(["“”])/g, m, inq = false;
+  while ((m = re.exec(text))) {
+    if (m[1]) { cur.words.push(m[1]); cur.punct.push(""); cur.quote.push(inq); }
+    else if (m[3]) inq = m[3] === "“" ? true : m[3] === "”" ? false : !inq;
+    else if (cur.words.length) { if (!cur.punct[cur.words.length - 1]) cur.punct[cur.words.length - 1] = m[2]; if (m[2] === "." || m[2] === "?" || m[2] === "!") { out.push(cur); cur = { words: [], punct: [], quote: [] }; } }
+  }
+  if (cur.words.length) out.push(cur);
+  return out;
+}
+function key() { return JSON.stringify([$("t").value, voiceName, dials.tone, dials.song, dials.steady, finish, TOGGLES.map(function (tg) { return !!chain[tg[0]]; })]); }
+// MAKING THE TAPE: each sentence read, carried in the voice and sung, in a worker of its own; where workers cannot start,
+// one by one with the page let breathe between. Each sentence is a stretch of the tape. (A page opened from a file may not
+// start a worker from a file beside it, and a browser says so in its console; so there the page does not try.)
+function make(thenSay) {
+  var mine = ++run, list = sentences($("t").value), k = key(), t0 = Date.now(), got = [], left = list.length, st = chainNow();
+  if (p) p.stop();
+  if (!list.length) { $("out").textContent = "nothing to say"; return; }
+  $("out").textContent = "making " + list.length + (list.length === 1 ? " sentence" : " sentences");
+  function back(r) { if (mine !== run) return; got[r.n] = r; if (--left === 0) done(); }
+  function here(job) { setTimeout(function () { if (mine === run) back(ecouterSing(job)); }, 0); }
+  list.forEach(function (sn, n) {
+    var job = { n: n, words: sn.words, punct: sn.punct, quote: sn.quote, voice: voiceName, tone: dials.tone, song: dials.song, steady: dials.steady, chain: st };
+    if (canWork) {
+      try {
+        var w = new Worker("index.worker.js");
+        w.onmessage = function (e) { back(e.data); w.terminate(); };
+        w.onerror = function (ev) { if (ev && ev.preventDefault) ev.preventDefault(); w.terminate(); canWork = false; here(job); };
+        w.postMessage(job); return;
+      } catch (x) { canWork = false; }
+    }
+    here(job);
+  });
+  function done() {
+    var parts = got.map(function (r) { return r.pcm; }), n = 0, at = 0, i, j, v = S.VOICES.get(voiceName);
+    tape = PL.tape(parts, SR); madeKey = k; how = " made in " + (Date.now() - t0) + " ms" + (canWork ? ", in workers." : ".");
+    parts.forEach(function (x) { n += x.length; }); whole = new Float32Array(n); parts.forEach(function (x) { whole.set(x, at); at += x.length; });
+    // the score's own account, laid along the tape: its pitch and its voicing a millisecond at a time, and where each word ends
+    var total = Math.ceil(tape.seconds * 1000) + 1; lineF = new Float32Array(total); lineV = new Float32Array(total); words = [];
+    got.forEach(function (r, sn) {
+      var a = tape.bounds[sn] * 1000, b, pf = r.f0[0], pv = r.vo[0], ms, u, wEnd = [], wStart = a;
+      for (i = 0; i < r.ms.length; i++) {
+        b = a + r.ms[i];
+        for (ms = Math.ceil(a); ms < b && ms < total; ms++) { u = (ms - a) / (b - a); lineF[ms] = pf + (r.f0[i] - pf) * u; lineV[ms] = pf > 0 && r.f0[i] > 0 ? pv + (r.vo[i] - pv) * u : 0; }
+        if (r.w[i] >= 0) wEnd[r.w[i]] = b;
+        pf = r.f0[i]; pv = r.vo[i]; a = b;
+      }
+      for (j = 0; j < wEnd.length; j++) { if (wEnd[j] === undefined) wEnd[j] = wStart; words.push({ a: wStart / 1000, b: wEnd[j] / 1000 }); wStart = wEnd[j]; }
+    });
+    home = 118 * (v.arc ? v.arc.pitch : 1) * dials.tone; specTop = 640 * Math.max(1, home / 118);
+    if (p) p.load(tape);
+    spectrogram(); drawWave(); drawSpec(); drawHead(); status();
+    if (thenSay) sayNow();
+  }
+}
+function changed() { if (tape || run) make(!!(p && p.on)); }     // a voice, a dial or a part of the finish was changed: sung again, and said again if it was being said
+function sayNow() { player(); p.seek(tape.bounds[0]); p.play(dials.speed); watch(); }
+function status() {
+  if (!tape) return;
+  var where = p ? p.where() : 0, thread = !p || p.silent ? "" : p.thread === "audio" ? " The head is on the audio thread." : p.thread === "page" ? " The head is on the painting thread: this browser has no AudioWorklet." : "";
+  $("out").textContent = where.toFixed(2) + " of " + tape.seconds.toFixed(2) + " s, " + tape.parts.length + (tape.parts.length === 1 ? " sentence," : " sentences,") + how + thread + note;
+}
+
+// ---------- the seeing: the wave, and the spectrogram ----------
+function fit(c) { var r = c.getBoundingClientRect(), w = Math.max(1, Math.round(r.width)); if (c.width !== w) c.width = w; return c.getContext("2d"); }
+function drawWave() {
+  var c = $("wave"), g = fit(c), W = c.width, H = c.height, x, i, a, b, lo, hi;
+  g.fillStyle = "#000"; g.fillRect(0, 0, W, H); if (!whole) return;
+  g.strokeStyle = "#333"; g.beginPath();
+  for (i = 1; i < tape.bounds.length - 1; i++) { x = Math.round(tape.bounds[i] / tape.seconds * W) + 0.5; g.moveTo(x, 0); g.lineTo(x, H); }
+  g.stroke(); g.strokeStyle = "#f0a437"; g.beginPath();
+  for (x = 0; x < W; x++) {
+    a = Math.floor(whole.length * x / W); b = Math.max(a + 1, Math.floor(whole.length * (x + 1) / W)); lo = 1; hi = -1;
+    for (i = a; i < b; i++) { if (whole[i] < lo) lo = whole[i]; if (whole[i] > hi) hi = whole[i]; }
+    g.moveTo(x + 0.5, H / 2 - hi * H * 0.48); g.lineTo(x + 0.5, H / 2 - lo * H * 0.48 + 1);
+  }
+  g.stroke();
+}
+function fft(re, im) {                                   // in place, radix 2
+  var n = re.length, i, j, k, m, t;
+  for (i = 1, j = 0; i < n; i++) { for (k = n >> 1; j & k; k >>= 1) j ^= k; j ^= k; if (i < j) { t = re[i]; re[i] = re[j]; re[j] = t; t = im[i]; im[i] = im[j]; im[j] = t; } }
+  for (m = 2; m <= n; m <<= 1) { var a = -2 * Math.PI / m, wr = Math.cos(a), wi = Math.sin(a);
+    for (i = 0; i < n; i += m) { var cr = 1, ci = 0;
+      for (j = 0; j < m / 2; j++) { var q0 = i + j, q = q0 + m / 2, xr = re[q] * cr - im[q] * ci, xi = re[q] * ci + im[q] * cr;
+        re[q] = re[q0] - xr; im[q] = im[q0] - xi; re[q0] += xr; im[q0] += xi; t = cr * wr - ci * wi; ci = cr * wi + ci * wr; cr = t; } } }
+}
+// the spectrogram of the sound itself, from nought to a little above the voice's third harmonic, in grey; made once for each tape
+function spectrogram() {
+  var H = $("spec").height, N = 2048, hop = Math.max(Math.round(SR * 0.004), Math.ceil(whole.length / 1600)), cols = Math.max(1, Math.ceil(whole.length / hop));
+  var re = new Float32Array(N), im = new Float32Array(N), win = new Float32Array(N), mags = [], mx = 1e-9, c, i, y;
+  for (i = 0; i < N; i++) win[i] = 0.5 - 0.5 * Math.cos(2 * Math.PI * i / (N - 1));
+  for (c = 0; c < cols; c++) {
+    for (i = 0; i < N; i++) { var s = c * hop - N / 2 + i; re[i] = s >= 0 && s < whole.length ? whole[s] * win[i] : 0; im[i] = 0; }
+    fft(re, im); var col = new Float32Array(H);
+    for (y = 0; y < H; y++) { var f = (H - 1 - y) / (H - 1) * specTop, b = f / SR * N, b0 = Math.floor(b), fr = b - b0, m0 = Math.hypot(re[b0], im[b0]), m1 = Math.hypot(re[b0 + 1], im[b0 + 1]); col[y] = m0 + (m1 - m0) * fr; if (col[y] > mx) mx = col[y]; }
+    mags.push(col);
+  }
+  specImg = document.createElement("canvas"); specImg.width = cols; specImg.height = H;
+  var g = specImg.getContext("2d"), img = g.createImageData(cols, H);
+  for (c = 0; c < cols; c++) for (y = 0; y < H; y++) { var v = Math.max(0, 1 + Math.log(mags[c][y] / mx + 1e-9) / Math.LN10 / 2.4), o = (y * cols + c) * 4, gr = Math.round(200 * Math.pow(v, 2.2)); img.data[o] = img.data[o + 1] = img.data[o + 2] = gr; img.data[o + 3] = 255; }
+  g.putImageData(img, 0, 0);
+}
+// the lamp's own gearing, mode by mode, about the home pitch of the voice chosen
+function hueAt(oct) {
+  var FULL = +$("full").value || 0.125, turn = 360 * oct, wholeTurn = 180 * Math.max(-1, Math.min(1, oct / FULL)), h = mode === "viriditas" ? turn : mode === "vivificat" ? turn + (wholeTurn - turn) * 0.62 : wholeTurn;
+  return ((120 + h) % 360 + 360) % 360;
+}
+function drawSpec() {
+  var c = $("spec"), g = fit(c), W = c.width, H = c.height, k, h;
+  g.fillStyle = "#000"; g.fillRect(0, 0, W, H); if (!specImg || !tape) return;
+  g.imageSmoothingEnabled = true; g.drawImage(specImg, 0, 0, W, H);
+  var step = specTop > 900 ? 200 : 100, f; g.font = "12px Consolas, monospace"; g.fillStyle = "#6f7a85";
+  for (f = step; f < specTop - step / 2; f += step) { var yy = H - 1 - f / specTop * (H - 1); g.fillRect(0, yy, 6, 1); g.fillText(f + " Hz", 9, yy + 4); }
+  var msW = W / (tape.seconds * 1000), FULL = +$("full").value || 0.125;
+  for (h = 1; h <= 3; h++) for (k = 1; k < lineF.length; k++) {
+    if (lineV[k] <= 0 || lineV[k - 1] <= 0 || !lineF[k] || !lineF[k - 1]) continue;
+    var oct = Math.log(lineF[k] / home) / Math.LN2, s = Math.min(1, Math.abs(oct) / FULL);
+    g.strokeStyle = mode === "none" ? "rgba(232,232,232," + (h === 1 ? 0.9 : 0.45) + ")" : "hsla(" + hueAt(oct) + "," + Math.round(40 + 60 * s) + "%,62%," + (h === 1 ? 1 : 0.55) + ")"; g.lineWidth = h === 1 ? 2.5 : 1.2;
+    g.beginPath(); g.moveTo((k - 1) * msW, H - 1 - lineF[k - 1] * h / specTop * (H - 1)); g.lineTo(k * msW, H - 1 - lineF[k] * h / specTop * (H - 1)); g.stroke();
+  }
+}
+// THE HEAD, seen: a red line on both pictures, the playhead, and a grey edge on the word being said. All from the head's
+// own place, so they hold when the tape is dragged or run backward.
+function drawHead() {
+  var at = tape && p ? p.where() : 0, u = tape && tape.seconds ? at / tape.seconds : 0, i, now = -1;
+  each(".head", function (h) { h.style.left = (u * 100) + "%"; });
+  if (!held || document.activeElement !== $("ph")) $("ph").value = Math.round(u * 1000);
+  if (ws.length === words.length && p && (p.on || held)) for (i = 0; i < words.length; i++) if (at < words[i].b) { now = i; break; }
+  for (i = 0; i < ws.length; i++) ws[i].classList.toggle("done", i === now);
+}
+// the pictures move only while there is something to show: a head at rest costs the page nothing
+function loop() { drawHead(); status(); if (p && (p.on || held)) requestAnimationFrame(loop); else { looping = false; drawHead(); } }
+function watch() { if (!looping) { looping = true; requestAnimationFrame(loop); } }
+$("say").onclick = function () { player(); if (madeKey !== key()) make(true); else sayNow(); };
+$("stop").onclick = function () { if (p) { p.stop(); setTimeout(function () { drawHead(); status(); }, 80); } };
+$("t").addEventListener("keydown", function (e) { if (e.key === "Enter" && e.ctrlKey) { e.preventDefault(); $("say").onclick(); } });
+$("save").onclick = function () {
+  if (!tape || !dials.speed) return;
+  var d = PL.dub(tape, { speed: dials.speed }), a = document.createElement("a"), url = URL.createObjectURL(new Blob([E.VOICEBOX.wav(d, SR)], { type: "audio/wav" }));
+  a.href = url; a.download = "ecouter.wav"; document.body.appendChild(a); a.click(); a.remove();
+};
+// THE HAND, on either picture or on the playhead: the head follows it, at the pace it moves
+function take(at) { if (!tape) return; player(); if (!held) { held = true; wasOn = p.on; } p.drag(at); watch(); }
+function letGo() { if (!held) return; held = false; each(".graph", function (g) { g.classList.remove("held"); }); p.drop(wasOn); watch(); }
+each(".graph", function (gr) {
+  function secs(e) { var r = gr.getBoundingClientRect(); return Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * tape.seconds; }
+  gr.addEventListener("pointerdown", function (e) { if (!tape) return; gr.classList.add("held"); try { gr.setPointerCapture(e.pointerId); } catch (x) {} take(secs(e)); e.preventDefault(); });
+  gr.addEventListener("pointermove", function (e) { if (held && gr.classList.contains("held")) take(secs(e)); });
+  gr.addEventListener("pointerup", letGo); gr.addEventListener("pointercancel", letGo);
+});
+$("ph").addEventListener("input", function () { if (tape) take(+this.value / 1000 * tape.seconds); });
+$("ph").addEventListener("change", letGo);
+addEventListener("resize", function () { if (whole) { drawWave(); drawSpec(); drawHead(); } });
+
+// ---------- the text samples ----------
+// user1's, 18 xi 2026, "a selection of short and long passages". As he gave them, with a line broken at each solidus.
+var SAMPLES = [
+  ["Is it you?", "Is it you? It is you! It's not only everyone; it's you, too."],
+  ["Zen koan", "Considering the lily / by the side of the road, / my horse ate it."],
+  ["Weller still", "Now is the time for all good minds to come to the aid of their history."],
+  ["Language licks", "Before words speak, tone tells. / Language asks for space, and gets it. / Speech shows up in color and explains itself."],
+  ["the Johnsonian", "The Great Society is a place where every child may find knowledge, to enrich their mind and to enlarge their talents. It is a place where leisure is a welcome chance to build and reflect, not a feared cause of boredom and restlessness. It is a place where the city of man serves not only the needs of the body and the demands of commerce but the desire for beauty and the hunger for community."],
+  ["Masefield's Salutation", "There are few earthly things more beautiful than a university. / It is a place where those who hate ignorance may strive to know, where those who perceive truth may strive to make others see; / where seekers and learners alike, banded together in the search for knowledge, / will honor thought in all its finer ways, will welcome thinkers in distress or in exile, / will uphold ever the dignity of thought and learning, and will exact standards in these things."],
+  ["Chaucer's Yeoman", "Upon his arm he bare a gai bracer, / And by his side a sword and a buckler, / And on that other side a fitting daggere, / Harnessed well, and sharp as point of spear: / A Christopher on his breast of silver sheen. / An horn he bare, the baldric was of green: / A forester was he soothly as I guess."],     // given in quotation marks, and they were taken off at his word: quoted words are lifted, and "That is speech, not song"
+  ["Emma's Colossus", "Here at our sea-washed, sunset gates shall stand / A mighty woman with a torch, whose flame / Is the imprisoned lightning, and her name / Mother of Exiles. From her beacon-hand / Glows world-wide welcome; her mild eyes command / The air-bridged harbor that twin cities frame.\n\"Keep, ancient lands, your storied pomp!\" cries she / With silent lips. \"Give me your tired, your poor, / Your huddled masses yearning to breathe free, / The wretched refuse of your teeming shore.\nSend these, the homeless, tempest-tost to me, / I lift my lamp beside the golden door!\""]
+].map(function (x) { return [x[0], x[1].split(/\s*\/\s*/).join("\n")]; });
+SAMPLES.forEach(function (x, i) { var o = document.createElement("option"); o.value = i; o.textContent = x[0]; $("sample").appendChild(o); });
+function whichSample() { var i, t = $("t").value, at = -1; for (i = 0; i < SAMPLES.length; i++) if (SAMPLES[i][1] === t) at = i; $("sample").selectedIndex = at; }   // none shown, when the words are the visitor's own
+$("sample").onchange = function () { var x = SAMPLES[+this.value]; if (!x) return; $("t").value = x[1]; tint(); make(!!(p && p.on)); };
+$("t").addEventListener("input", whichSample); $("lit").addEventListener("input", whichSample);
+
+// ---------- what the page remembers ----------
+// user1, 18 xi 2026: "I'd like to remember all that the user sets, from theme size to settings to their currently entered text.
+// People may link this page as the only place their words have ever been in color." So everything set here is kept, in this
+// browser's own store and nowhere else, and About says so. Reset puts the choices back, and leaves the words alone.
+var KEEP = "ecouter.front", keepTimer = 0;
+function firstChoices() { return { text: SAMPLES[0][1], light: "night", size: 6, mode: "omnia", room: "normal", glows: {}, mix: 0.75, full: 0.125, auto: false, voice: ORDER[0], per: {}, finish: true, resound: true, chain: E.CHAIN.settings(E.CHAIN.PRESETS[E.CHAIN.HOUSE_NAME]) }; }
+function choices() {
+  var ch = {}; TOGGLES.forEach(function (tg) { ch[tg[0]] = !!chain[tg[0]]; }); PER[voiceName] = dials;
+  return { v: 1, text: $("t").value, light: light, size: size, mode: mode, room: roomName, glows: glows, mix: $("mix").value, full: $("full").value, auto: $("auto").classList.contains("on"), voice: voiceName, per: PER, finish: finish, resound: resound, chain: ch };
+}
+function keep() { keepTimer = 0; try { localStorage.setItem(KEEP, JSON.stringify(choices())); } catch (e) {} }
+function keepSoon() { if (!keepTimer) keepTimer = setTimeout(keep, 300); }
+function choose(o) {       // every choice on the page set from one record, and the page made to show it
+  var f = firstChoices(), k, d;
+  for (k in f) if (o[k] === undefined || o[k] === null) o[k] = f[k];
+  $("t").value = String(o.text);
+  size = SIZES[o.size] ? +o.size : f.size; sample(0);
+  mode = /^(none|viriditas|omnia|vivificat)$/.test(o.mode) ? o.mode : f.mode; each(".modes button", function (b) { b.classList.toggle("on", b.getAttribute("data-mode") === mode); });
+  roomName = /^(none|close|normal|royal)$/.test(o.room) ? o.room : f.room; each(".rooms button", function (b) { b.classList.toggle("on", b.getAttribute("data-room") === roomName); });
+  glows = {}; for (k in LIGHTS) if (o.glows && isFinite(+o.glows[k]) && o.glows[k] !== null && o.glows[k] !== "") glows[k] = +o.glows[k];
+  $("mix").value = isFinite(+o.mix) ? o.mix : f.mix; $("full").value = +o.full > 0 ? o.full : f.full; $("auto").classList.toggle("on", !!o.auto);
+  voiceName = ORDER.indexOf(o.voice) >= 0 ? o.voice : f.voice; PER = {};
+  ORDER.forEach(function (n) { d = o.per && o.per[n]; if (d && isFinite(+d.tone) && isFinite(+d.speed) && isFinite(+d.song) && isFinite(+d.steady)) PER[n] = { tone: +d.tone, speed: +d.speed, song: +d.song, steady: +d.steady }; });
+  dials = PER[voiceName] || own(voiceName); each("#voices button", function (b) { b.classList.toggle("on", b.getAttribute("data-voice") === voiceName); }); showDials();
+  finish = !!o.finish; $("finish").classList.toggle("on", finish); $("toggles").classList.toggle("off", !finish);
+  resound = !!o.resound; $("resound").classList.toggle("on", resound);
+  TOGGLES.forEach(function (tg) { chain[tg[0]] = !!o.chain[tg[0]]; }); each("#toggles button", function (b) { b.classList.toggle("on", !!chain[b.getAttribute("data-part")]); });
+  if (p) { p.resound(resound); p.pace(dials.speed); }
+  setLight(LIGHTS[o.light] ? o.light : f.light); whichSample();
+}
+$("reset").onclick = function () { var o = firstChoices(); o.text = $("t").value; choose(o); try { localStorage.removeItem(KEEP); } catch (e) {} make(!!(p && p.on)); };
+["click", "input", "change"].forEach(function (ev) { document.addEventListener(ev, keepSoon, true); });
+addEventListener("pagehide", function () { if (keepTimer) { clearTimeout(keepTimer); keep(); } });
+(function () { var o = null; try { o = JSON.parse(localStorage.getItem(KEEP) || "null"); } catch (e) {} choose(o && typeof o === "object" ? o : firstChoices()); })();
+make(false);     // the tape is made as the page opens, so there is something to see and to take hold of
+</script>
