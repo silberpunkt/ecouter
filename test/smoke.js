@@ -54,5 +54,16 @@ t('and the throat sings it', rp.length > 12000 && rp.length < 20000, (rp.length 
 t('the voices are eight, by name, and Phillippe is the stock voice', R.VOICES.names.length === 8 && R.VOICES.get('phillippe').arc === null && JSON.stringify(R.arc(sc0, 'phillippe').frames) === JSON.stringify(sc0.frames), R.VOICES.names.join(' '));
 var la = R.as(sc0, 'lauren'), lp = R.say(la, { turns: 2 });
 t('a score carried in a voice is sung, and says how fast its tape should run', la.voice.name === 'lauren' && la.voice.speed === 0.96 && la.voice.steady === 0.65 && lp.length > 8000, (lp.length / RL.SR).toFixed(2) + ' s');
+var PFILE = FILE === 'ecouter.min.js' ? 'ecouter-player.min.js' : 'ecouter-player.js';   // the player ring: another file beside the library
+if (typeof require !== 'function') std.loadScript(scriptArgs[0].split('/').slice(0, -2).concat([PFILE]).join('/') || PFILE); else require('../' + PFILE)(E);
+var PL = RL.PLAYER;
+t('the player ring loads beside the library', !!PL && typeof PL.open === 'function' && typeof PL.dub === 'function' && PL.SR === RL.SR);
+var slow = PL.dub(PL.tape([lp], RL.SR), { speed: la.voice.speed }), whole = PL.dub(PL.tape([lp], RL.SR)), wd = 0, wi;
+for (wi = 0; wi < lp.length - 1; wi++) wd = Math.max(wd, Math.abs(whole[wi] - lp[wi]));
+t('a tape dubbed at the spoken pace is the sound that went in, and at her pace it is as much longer', whole.length === lp.length && wd < 1e-6 && slow.length === Math.round(lp.length / 0.96), (slow.length / RL.SR).toFixed(2) + ' s at 0.96');
+var hd = null; try { new Function('registerProcessor', 'AudioWorkletProcessor', 'currentTime', 'sampleRate', PL.HEAD_SRC)(function (n) { hd = n; }, function () {}, 0, 48000); } catch (e) { hd = String(e); }
+t('the head, written out for the audio thread, reads as a program', hd === 'ecouter-head', hd);
+var silent = PL.open();
+t('and where there is no sound a player is there, silent, and does not throw', silent.silent === true && silent.load(lp).play(0.96).stop() === silent);
 print(ok + ' passed, ' + bad + ' failed');
 if (typeof process !== 'undefined') process.exitCode = bad ? 1 : 0;

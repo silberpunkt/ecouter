@@ -1,0 +1,166 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>tape</title>
+<style>
+  body { font: 15px/1.45 Iosevka, Consolas, monospace; margin: 24px auto; max-width: 860px; padding: 0 16px; background: #111; color: #eee }
+  h1 { font-size: 22px; margin: 0 0 6px } p { margin: 6px 0; color: #bbb } p b { color: #eee; font-weight: 600 }
+  textarea { width: 100%; height: 72px; box-sizing: border-box; font: inherit; background: #000; color: #eee; border: 1px solid #444; padding: 6px; margin-top: 12px }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0 }
+  button, select { font: inherit; color: #eee; background: #0031c48c; border: 1px solid #58bff0; border-radius: 2px; padding: 3px 12px; cursor: pointer }
+  select { background: #001a66; padding: 3px 6px } optgroup, option { background: #111; color: #eee }
+  button.on { border-color: #f0a437; color: #f0a437 }
+  .modes { display: inline-flex; gap: 0 } .modes button { border-radius: 0 } .modes button:first-child { border-radius: 2px 0 0 2px } .modes button:last-child { border-radius: 0 2px 2px 0 }
+  label { color: #bbb } label input[type=range] { width: 260px; vertical-align: middle; margin: 0 6px } #pv { display: inline-block; min-width: 3.2em; color: #eee }
+  #out { color: #9c9; font-size: 13px; word-break: break-word; min-height: 1.4em }
+  .graph { position: relative; margin-top: 8px; touch-action: none; cursor: grab } .graph.held { cursor: grabbing }
+  canvas { display: block; width: 100%; height: 140px; background: #000 }
+  .head { position: absolute; top: 0; bottom: 0; left: 0; border-left: 1px solid #f05858; pointer-events: none }
+  p.key { margin-top: 10px }
+</style>
+<h1>Tape</h1>
+<p><b>ecouter-player.js</b> plays what Ecouter makes. The sound is a tape, and a head reads it: at any pace, either way,
+by itself or under your hand. The head lives on the audio thread, so nothing the page does can make it stutter.</p>
+<p>Type a sentence and press Play. Then take hold of the picture and drag it: the voice goes with your hand, backward too.
+Move the pace while it plays and hear the tape slow, stop and turn round.</p>
+<textarea id="t">Is it you? It is you! It's not only everyone; it's you, too.</textarea>
+<div class="row"><button id="play" title="Run the tape from where the head is, at the pace below. If the words, the voice or Mellow have changed, the tape is made again first.">Play</button><button id="stop" title="Rest the head where it is. Play goes on from there.">Stop</button><button id="start" title="Lift the head and set it down at the start of the tape.">To the start</button><button id="save" title="The tape as it would be heard at this pace, written to a file. The room after the head is not in it.">Save .wav</button><span id="out"></span></div>
+<div class="row"><label title="Each voice is an arc over the sentence and four dials, asked of Ecouter by name. Choosing one sets the pace to the speed of its own tape.">Voice <select id="voice"></select></label>
+  <label title="The pace of the tape. 1 is the pace it was spoken at; below 1 is slower and lower; below 0 is backward.">Pace <input id="pace" type="range" min="-2" max="2" step="0.01" value="1"><span id="pv">1.00</span></label>
+  <button id="own" title="Set the pace back to the speed of this voice's own tape.">Voice's own</button></div>
+<div class="row"><button id="mellow" class="on" title="A room laid into the sound, on the tape: Ecouter's kind microphone. Run the tape backward and this room runs backward with it.">Mellow</button><button id="resound" class="on" title="A room after the head: the air about the machine. A lift at the chest of the voice, a little taken from the top, and a short scattered return. It stays still whatever the tape does.">Resound</button>
+  <span style="color:#bbb">At the end:</span><span class="modes" id="ends"><button data-end="stop" class="on" title="At the end of the tape the head stops.">Stop</button><button data-end="through" title="At the end of the tape the head goes round to the other end.">Through</button><button data-end="reflect" title="At the end of the tape the head turns back.">Reflect</button></span></div>
+<div class="graph" id="graph" title="Take hold and drag: the head follows your hand."><canvas id="wave" height="140"></canvas><i class="head" id="head"></i></div>
+<p class="key">The picture is the tape: its waveform, with a faint line where one sentence ends and the next begins. The red line is the head.</p>
+<p class="key">Options:<br>
+Voice: Eight voices, each asked of Ecouter by name.<br>
+Pace: The speed of the tape. Pitch goes with it, as on a tape. Below 0 is backward.<br>
+Voice's own: The speed this voice's tape is meant to be run at. Obelus is Arthur at 0.83.<br>
+Mellow: A room laid into the sound, on the tape.<br>
+Resound: A room after the head, in the air about the machine.<br>
+At the end: Stop, go round again, or turn back.</p>
+<p class="key">Two rooms. Mellow is on the tape, so it is dragged with the voice, and a room run backward is heard as one. Resound is after
+the head, and stays still. Try each alone with the pace below 0, and then both together: whether two rooms are one too
+many is a question for the ear.</p>
+<p class="key">This page keeps nothing and sends nothing.</p>
+<script src="../ecouter.js"></script>
+<script src="../ecouter-score.js"></script>
+<script src="../ecouter-player.js"></script>
+<script>
+var E = ECOUTER, S = E.SCORE, PL = E.PLAYER, SR = E.SR;
+var p = null, tape = null, whole = null, made = "", run = 0, voiceName = "obelus", mellow = true, resound = true, ends = "stop", pace = 1, looping = false, held = false, wasOn = false, note = "";
+function $(id) { return document.getElementById(id); }
+// THE PLAYER is made on the first press, not before: a browser will not start sound until the person has pressed something.
+function player() {
+  if (!p) { p = PL.open({ resound: resound, end: ends }); p.onend = function () { drawHead(); status(); };
+    if (p.silent) note = " This browser gave no sound device, so nothing is heard here; the tape is still drawn, and Save still writes the sound to a file.";
+    if (tape) p.load(tape); }
+  p.wake(); return p;
+}
+// the voices, by name, grouped as Ecouter groups them
+(function () {
+  var groups = {}, sel = $("voice");
+  S.VOICES.names.forEach(function (n) { var v = S.VOICES.get(n); (groups[v.kin] = groups[v.kin] || []).push(v); });
+  Object.keys(groups).sort().reverse().forEach(function (kin) {
+    var g = document.createElement("optgroup"); g.label = kin;
+    groups[kin].forEach(function (v) { var o = document.createElement("option"); o.value = v.name; o.textContent = v.name.charAt(0).toUpperCase() + v.name.slice(1); o.title = v.says; g.appendChild(o); });
+    sel.appendChild(g);
+  });
+  sel.value = voiceName;
+})();
+function setPace(v) { pace = Math.round(v * 100) / 100; $("pace").value = pace; $("pv").textContent = pace.toFixed(2); if (p) { p.speed = pace; if (p.on) p.pace(pace); } }
+setPace(S.VOICES.get(voiceName).speed);
+// the text, as sentences of words and the marks that follow them
+function sentences(text) {
+  var out = [], cur = { words: [], punct: [] }, re = /([A-Za-z0-9][A-Za-z0-9'’-]*)|([.,;:?!])/g, m;
+  while ((m = re.exec(text))) {
+    if (m[1]) { cur.words.push(m[1]); cur.punct.push(""); }
+    else if (cur.words.length) { if (!cur.punct[cur.words.length - 1]) cur.punct[cur.words.length - 1] = m[2]; if (m[2] === "." || m[2] === "?" || m[2] === "!") { out.push(cur); cur = { words: [], punct: [] }; } }
+  }
+  if (cur.words.length) out.push(cur);
+  return out;
+}
+function key() { return voiceName + "|" + mellow + "|" + $("t").value; }
+// MAKING THE TAPE: each sentence read, carried in the voice, and sung, one at a time with the page let breathe between.
+// Each is a stretch of the tape.
+function make(then) {
+  var mine = ++run, list = sentences($("t").value), parts = [], i = 0, t0 = Date.now(), k = key();
+  if (!list.length) { $("out").textContent = "nothing to say"; return; }
+  var st = E.CHAIN.settings(E.CHAIN.PRESETS[E.CHAIN.HOUSE_NAME]); st.mellow = mellow;
+  if (p) p.stop();
+  (function one() {
+    if (mine !== run) return;
+    if (i < list.length) {
+      $("out").textContent = "making sentence " + (i + 1) + " of " + list.length;
+      setTimeout(function () { if (mine !== run) return; parts.push(S.say(S.as(S.read(list[i].words, list[i].punct), voiceName), { voice: st })); i++; one(); }, 0);
+      return;
+    }
+    tape = PL.tape(parts, SR); made = k;
+    var n = 0, at = 0; parts.forEach(function (x) { n += x.length; }); whole = new Float32Array(n); parts.forEach(function (x) { whole.set(x, at); at += x.length; });
+    tape.ms = Date.now() - t0;
+    if (p) p.load(tape);
+    drawWave(); drawHead(); status();
+    if (then) then();
+  })();
+}
+function status() {
+  if (!tape) return;
+  var where = p ? p.where() : 0, thread = !p ? "" : p.silent ? "" : p.thread === "audio" ? " The head is on the audio thread." : p.thread === "page" ? " The head is on the painting thread: this browser has no AudioWorklet." : "";
+  $("out").textContent = where.toFixed(2) + " of " + tape.seconds.toFixed(2) + " s, " + tape.parts.length + (tape.parts.length === 1 ? " sentence" : " sentences") + ", made in " + tape.ms + " ms." + thread + note;
+}
+function fit(c) { var r = c.getBoundingClientRect(); if (c.width !== Math.round(r.width)) c.width = Math.round(r.width); return c.getContext("2d"); }
+function drawWave() {
+  var c = $("wave"), g = fit(c), W = c.width, H = c.height, x, i, a, b, lo, hi;
+  g.fillStyle = "#000"; g.fillRect(0, 0, W, H); if (!whole) return;
+  g.strokeStyle = "#333"; g.beginPath();
+  for (i = 1; i < tape.bounds.length - 1; i++) { x = Math.round(tape.bounds[i] / tape.seconds * W) + 0.5; g.moveTo(x, 0); g.lineTo(x, H); }
+  g.stroke(); g.strokeStyle = "#f0a437"; g.beginPath();
+  for (x = 0; x < W; x++) {
+    a = Math.floor(whole.length * x / W); b = Math.max(a + 1, Math.floor(whole.length * (x + 1) / W)); lo = 1; hi = -1;
+    for (i = a; i < b; i++) { if (whole[i] < lo) lo = whole[i]; if (whole[i] > hi) hi = whole[i]; }
+    g.moveTo(x + 0.5, H / 2 - hi * H * 0.48); g.lineTo(x + 0.5, H / 2 - lo * H * 0.48 + 1);
+  }
+  g.stroke();
+}
+function drawHead() { var u = tape && p && tape.seconds ? p.where() / tape.seconds : 0; $("head").style.left = (u * 100) + "%"; }
+// the picture moves only while there is something to show: a head at rest costs the page nothing
+function loop() { drawHead(); status(); if (p && (p.on || held)) requestAnimationFrame(loop); else looping = false; }
+function watch() { if (!looping) { looping = true; requestAnimationFrame(loop); } }
+function play() {
+  player();
+  if (made !== key()) { make(function () { p.play(pace); watch(); }); return; }
+  p.play(pace); watch();
+}
+$("play").onclick = play;
+$("stop").onclick = function () { run++; if (p) { p.stop(); drawHead(); status(); } };
+$("start").onclick = function () { if (p && tape) { p.seek(0); drawHead(); status(); } };
+$("t").addEventListener("keydown", function (e) { if (e.key === "Enter" && e.ctrlKey) { e.preventDefault(); play(); } });
+$("voice").onchange = function (e) { voiceName = e.target.value; setPace(S.VOICES.get(voiceName).speed); if (tape) make(p && p.on ? function () { p.play(pace); watch(); } : null); };
+$("pace").oninput = function (e) { setPace(+e.target.value); };
+$("own").onclick = function () { setPace(S.VOICES.get(voiceName).speed); };
+$("mellow").onclick = function (e) { mellow = !mellow; e.target.classList.toggle("on", mellow); if (tape) make(p && p.on ? function () { p.play(pace); watch(); } : null); };
+$("resound").onclick = function (e) { resound = !resound; e.target.classList.toggle("on", resound); if (p) p.resound(resound); };
+Array.prototype.forEach.call($("ends").children, function (b) {
+  b.onclick = function () { ends = b.getAttribute("data-end"); Array.prototype.forEach.call($("ends").children, function (o) { o.classList.toggle("on", o === b); }); if (p) p.ends(ends); };
+});
+$("save").onclick = function () {
+  if (!tape || !pace) return;
+  var d = PL.dub(tape, { speed: pace }), a = document.createElement("a"), url = URL.createObjectURL(new Blob([E.VOICEBOX.wav(d, SR)], { type: "audio/wav" }));
+  a.href = url; a.download = "tape.wav"; document.body.appendChild(a); a.click(); a.remove();
+};
+// THE HAND. Take hold of the picture and the head follows: where the hand is, at the pace the hand moves.
+(function () {
+  var gr = $("graph");
+  function secs(e) { var r = gr.getBoundingClientRect(); return Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * tape.seconds; }
+  gr.addEventListener("pointerdown", function (e) {
+    if (!tape) return; player(); held = true; wasOn = p.on; gr.classList.add("held");
+    try { gr.setPointerCapture(e.pointerId); } catch (x) {}
+    p.drag(secs(e)); watch(); e.preventDefault();
+  });
+  gr.addEventListener("pointermove", function (e) { if (held) p.drag(secs(e)); });
+  function up() { if (!held) return; held = false; gr.classList.remove("held"); p.drop(wasOn); watch(); }
+  gr.addEventListener("pointerup", up); gr.addEventListener("pointercancel", up);
+})();
+addEventListener("resize", function () { if (whole) { drawWave(); drawHead(); } });
+make(null);     // the tape is made as the page opens, so there is something to take hold of
+</script>

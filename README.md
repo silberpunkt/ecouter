@@ -87,6 +87,7 @@ Under Node: `const E = require('./ecouter-speech.js')`, with the same calls. [Th
 | `viriditas.min.js` | the colour alone, with no throat | 48,366 B | 13.2 KB |
 | `ecouter.min.js` | everything: voice, colour, and Bell's *Visible Speech* | 76,453 B | 21.1 KB |
 | `ecouter-score.min.js` | a ring beside the library: work on a score before it is sung, and the voices by name | 10,637 B | 3.9 KB |
+| `ecouter-player.min.js` | a second ring: a tape, a head that does not pop, the speed of the tape, and a room | 13,562 B | 4.7 KB |
 
 Each has a commented, unshrunk twin without `.min`. The `.min` files only drop comments: newlines and indentation are kept, so they stay readable. Compressed sizes are gzip -9, which is roughly what a web server sends.
 
@@ -112,6 +113,21 @@ var pcm = ECOUTER.SCORE.say(s);   // s.voice.speed is the speed her tape should 
 
 Phillippe is the stock voice, with nothing done to him; every other was made by slowing, lowering or rounding him. The arcs grew in Nuage, and the dials were found in Obelus. Each voice has its own share of song, set by ear.
 
+**The player ring** plays what Ecouter makes. Ecouter itself plays nothing: it hands you samples. The player treats the sound as a tape and reads it with a head, at any pace, either way, by itself or under a hand. The head lives on the audio thread, so nothing a page does can make it stutter, and it never jumps in loudness: starting, stopping and being lifted are each a short ramp. Pitch goes with pace, as on a tape, so a voice's own speed is simply the pace its tape is played at.
+
+```js
+var p = ECOUTER.PLAYER.open();                      // one audio context, guarded; make it on a click
+var s = ECOUTER.SCORE.as(ECOUTER.SCORE.read(["Is", "it", "you"], ["", "", "?"]), "obelus");
+p.load(ECOUTER.SCORE.say(s)).play(s.voice.speed);   // Obelus: Arthur, with the tape at 0.83
+p.stop(); p.seek(1.5); p.play(-1);                  // rest; lift the head and set it down; backward
+p.drag(seconds); p.drop();                          // a hand has the tape; the hand lets go
+p.resound(true);                                    // a small room, after the head
+```
+
+**Resound** is the room: a lift at the chest of the voice, a little taken from the top, and a short scattered return, "as if listening to a friend in a wooden sunlit room." It sits after the head, so it stays still while the tape is dragged or run backward. Without a browser there is nothing to hear, but the same head will run a tape into a buffer: `ECOUTER.PLAYER.dub(ECOUTER.PLAYER.tape([pcm]), { speed: 0.83 })`. In a page with no library at all, the file stands alone as `PLAYER` and will play any samples you give it.
+
+[The tape page](https://silberpunkt.github.io/ecouter/examples/tape.html) is a sentence, a pace and a head: press Play, then take hold of the picture and drag it. The head, its ramps and the room were all found in [Obelus](https://github.com/silberpunkt/obelus).
+
 ## What's inside
 
 - **The rules.** The 355 letter-to-sound rules of the U.S. Naval Research Laboratory's Report 7948 (1976), copied by program from the public-domain C of 1985. The matcher follows that C line for line. `ECOUTER.trace(text)` tells you which rule read each letter.
@@ -131,7 +147,7 @@ node test/smoke.js          # the commented files
 node test/smoke.js min      # the .min files
 ```
 
-24 checks, covering all three libraries and the score ring, in under a second. Under QuickJS: `qjs --std test/smoke.js`.
+28 checks, covering all three libraries and the two rings, in under a second. Under QuickJS: `qjs --std test/smoke.js`.
 
 **The temp cache.** Under Node or QuickJS, Ecouter keeps each gusted sound it makes in `temp-cache/`, in the folder you run from, named by a hash of the sound and its settings. Making the same sound again is then instant. The folder is safe to delete, and git ignores it. To keep nothing on disk, set `ECOUTER.CHAIN.cache = null`. In a web page there is no disk, and no cache.
 

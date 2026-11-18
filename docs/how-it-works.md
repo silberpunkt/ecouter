@@ -99,9 +99,21 @@ var s = ctx.createBufferSource(); s.buffer = b; s.connect(ctx.destination); s.st
 
 So keep the old head as a fallback for an engine with no worklet, and use the new one wherever there is one.
 
+**Or let the player ring do it.** `ecouter-player.js` is that head, ready made, with its fallback and its guards: a file beside the library that hangs itself on as `ECOUTER.PLAYER`. The sound is a tape, measured in seconds at the pace it was spoken; the head reads it at a place and a pace. `examples/tape.html` is the whole of it in one page.
+
+```js
+var p = ECOUTER.PLAYER.open();        // on a click
+p.load(pcm).play(0.83);               // p.stop(), p.seek(seconds), p.play(-1)
+p.drag(seconds); p.drop();            // a hand has the tape
+```
+
+Three things about that head are worth knowing, whoever writes it. It **never jumps in loudness**: starting, stopping and being lifted to another place are each a ramp of four thousandths of a second, so there is no click even in the middle of a wave. It is **told, not asked**: the page sends it words (play, stop, seek, follow) and it carries on by itself between them, so a page that is busy, or hidden, does not stop the voice. And when it **follows a hand** it runs at the pace the hand was moving and is only nudged toward the hand's place, by three in the hundred, because a pace that is corrected sharply is heard as a wobble in the pitch.
+
 **Never cancel a curve that is running.** If you steer pitch or loudness with `setValueCurveAtTime` and then need to change your mind, do not cancel it. Browsers disagree about what that means, and one has no way to cancel and hold at all; in Homburg that left a sound playing after Stop. Make a new source with its new curves, fade the old one out with a gain of its own, and let it go. Put one plain gain before the loudspeaker, with no curve on it, and let Stop be that gain coming down.
 
-**A room belongs after the head.** Ecouter's own `mellow` lays a little room into the sound, which is right for a sound played whole. A sound that is dragged or run backward drags whatever is on it, and a room played backward is heard as one. So for a voice that is scrubbed, put the room after the head, as filters in the page: it is then the air about the machine, and stays still.
+**A room belongs after the head.** Ecouter's own `mellow` lays a little room into the sound, which is right for a sound played whole. A sound that is dragged or run backward drags whatever is on it, and a room played backward is heard as one. So for a voice that is scrubbed, put the room after the head, as filters in the page: it is then the air about the machine, and stays still. The player ring's Resound is such a room: a peak of 3 dB at 170 Hz, a shelf of 2 dB down above 4.2 kHz, and a scattered return that begins 12 ms after the voice, is gone in a quarter of a second, and lies 11.8 dB under it.
+
+**Leave the room its room.** What Ecouter makes stands at nine tenths of full scale. A lift and a return added after it raise the peak: measured over four voices, by as much as a third, which at full volume is clipped at the loudspeaker. The player opens at a volume of 0.8 for that reason, and the peak then stood at 0.96.
 
 **What was tried, 18 November 2026.** The three example pages, each opened and pressed:
 
@@ -112,6 +124,17 @@ So keep the old head as a fallback for an engine with no worklet, and use the ne
 | Firefox 159 and WebKit 27.2, headless, with no sound device | all three open and answer the press without error; the context stays suspended, so nothing is heard |
 
 Not tried that day: Servo, and any of them by a person's ear.
+
+`examples/tape.html`, the same day:
+
+| Engine | What happened |
+|---|---|
+| Chromium 152, headless, the sound tapped where it leaves | played whole at 0.83; dragged forward, held still, dragged backward; the pace swept through nought to backward; turned back at the end of the tape at twice the pace. No gaps and no clicks: the largest step between two samples was 0.06 of full scale, and 0.12 at twice the pace. Peak 0.96. Silence after Stop |
+| Chromium 152, the head kept on the painting thread | speaks, with no gaps, in a page this light |
+| Chromium 152, made to refuse a context | carries on without error, draws the tape, and says that nothing can be heard |
+| Firefox 159 and WebKit 27.2, headless, with no sound device | the page opens and answers the press and the drag without error; the head loads on the audio thread; the context stays suspended, so nothing is heard. Run off line in each engine's own worklet, the head speaks forward and backward and falls silent at the end of the tape |
+
+Not tried: Servo, and any of them by a person's ear.
 
 ## Where the source lives
 
