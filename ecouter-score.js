@@ -9,12 +9,16 @@
      s = ECOUTER.SCORE.fit(s, [180, 150, 420]);        // each word made to last so many milliseconds
      s = ECOUTER.SCORE.sing(s, 0.5);                   // half way from speech to song
      var pcm = ECOUTER.SCORE.say(s);                   // and then it is sung: Float32Array, 16 kHz
+   And the voices, by name:
+     ECOUTER.SCORE.VOICES.names                        // phillippe nuage miria lauren arthur obelus rudolf blando
+     s = ECOUTER.SCORE.as(ECOUTER.SCORE.read(["Is", "it", "you"], ["", "", "?"]), "lauren");   // her arc, her tone, her song
+     var pcm = ECOUTER.SCORE.say(s);                   // sung as steady as she is; s.voice.speed is the tape speed, for whoever plays it
    In node:  var E = require("./ecouter.js"); require("./ecouter-score.js"); E.SCORE.read(...)
    and to hang it on another library:  require("./ecouter-score.js")(require("./ecouter-speech.js"))
 
    Every function takes a score and gives back a new one. These came home from Obelus, where they were one
    function that fitted each word of a sentence to the width of that word on a line of type. SING is
-   Audenare's. The ecouter workshop, 2026. */
+   Audenare's. The voices grew in Nuage and were tuned in Obelus. The ecouter workshop, 2026. */
 (function (hang) {
   if (typeof ECOUTER !== 'undefined') hang(ECOUTER);                       // a page, or QuickJS: the library is on the global
   else if (typeof module !== 'undefined' && module.exports) { module.exports = hang; hang(require('./ecouter.js')); }   // node: hung on the whole library, and handed out to be hung on another
@@ -164,10 +168,139 @@
   else root.SCORE = SCORE;
 })(root);
 
-  // SAY: a score, sung. o.voice: a chain of settings, the house voice unless said; o.turns: as in ECOUTER.say.
+// ======== voices.js ========
+/* voices.js -- the voices: all Ecouter, differently carried.
+
+   A voice is an operation on the frames of a sentence before they are
+   sung, and stock Ecouter is what you get when the operation does nothing
+   (user1, 5 xi 2026: "All expressions are described as operations upon
+   Ecouter"). The operation is an ARC: one curve over the span of the
+   sentence that moves pace and pitch together, with a size of throat and
+   a share of breath and hiss. Every voice also carries DIALS, kept with
+   it: tone, speed, song and steady.
+
+   The arcs grew in Nuage in a day, and came here by her note of 5 xi 2026,
+   "Voices upon Ecouter". The dials were found in Obelus (its IOU 3, 15 xi
+   2026). Each voice is a personage, and may be asked for by name.
+
+   THE SONG of each voice here is user1's ruling of 18 xi 2026, for a voice
+   heard anywhere but on Obelus's line: "it belongs, though less musically
+   than in Obelus." There a line of type is being sung; here a sentence is
+   being said. So most of the numbers below are lower than Obelus's own,
+   which it keeps for itself. He says of them: "In truth these are guesses
+   and I need my ears too."
+
+     VOICES.names                       // ['phillippe', 'nuage', 'miria', ...]
+     VOICES.get('lauren')               // { name, kin, arc, tone, speed, song, steady, says }
+     VOICES.arc(frames, 'lauren')       // new frames, her arc laid over them
+     VOICES.on(score, 'lauren')         // the same, for a score of the score ring
+     VOICES.as(score, 'lauren')         // a score carried in her voice entire: arc, tone and song
+
+   PHILLIPPE is the stock voice, and has no arc at all. Every other voice
+   was made by slowing, lowering or rounding him. */
+(function (root) {
+  'use strict';
+  var S = root.SCORE || require('./score.js');
+
+  /* THE ARCS. time: her share of his time; rateArc and pitchArc: how far pace and pitch swing across the sentence,
+     on the one curve; pitch: lifted by so much; dot: a small accumulation in each swell; tract: the size of the
+     throat; breath and hiss: by these factors; flat and even (Blando only): pitch drawn toward its mean, and each
+     frame's length toward the even. */
+  var NUAGE  = { time: 0.86, rateArc: 0.22, pitch: 1.5, pitchArc: 0.07, dot: 0.025, tract: 1.13, breath: 1, hiss: 1 };
+  var MIRIA  = { time: 0.78, rateArc: 0.36, pitch: 1.72, pitchArc: 0.13, dot: 0.05, tract: 1.19, breath: 0.35, hiss: 1.25 };
+  var BLANDO = { time: 1.12, rateArc: 0, pitch: 0.87, pitchArc: 0, dot: 0, tract: 0.97, breath: 0.45, hiss: 1.1, flat: 0.72, even: 0.45 };
+  var ARTHUR = { time: 1 / 1.08, rateArc: -0.08, pitch: 1.0595, pitchArc: -0.03, dot: -0.01, tract: 0.95, breath: 1.15, hiss: 0.9 };
+  var LAUREN = { time: 0.86, rateArc: 0.22, pitch: 1.5, pitchArc: 0.04, dot: 0.025, tract: 1.13, breath: 1.5, hiss: 0.9 };   // Nuage's arc, with more breath, a gentler rise and a softer hiss
+
+  /* THE CAST. kin is how a menu may group them. A voice with no dials of its own speaks at tone 1 and speed 1, with the
+     house's share of song (0.34), and as steady as the house (0.79). Song is given to each by name, his words beside it. speed is the speed of a tape: it lowers the pitch and slows the pace
+     together, and so it is a player's to apply, not the score's. */
+  var CAST = [
+    { name: 'phillippe', kin: 'Men', arc: null, song: 0.34,   // "Phillippe will do just fine on the .34"
+      says: 'Stock Ecouter, with nothing done to him. Quick, high and earnest: he is five, and trying hard.' },
+    { name: 'nuage', kin: 'Women', arc: NUAGE, song: 0.34,
+      says: 'The small cloud. She begins slower and lower, ends faster and higher, and is done in 86 parts of his hundred.' },
+    { name: 'miria', kin: 'Women', arc: MIRIA, tone: 1.03, speed: 1.04, song: 0.63, steady: 0.87,   // "She sings a lot and should, but one needs a coloratura to set foot to earth sometimes" (0.79 on Obelus's line)
+      says: 'All that Nuage is, nearly crackingly too much: too clear, too singing, too tight.' },
+    { name: 'lauren', kin: 'Women', arc: LAUREN, tone: 0.86, speed: 0.96, song: 0.34, steady: 0.65,   // 0.43 on Obelus's line
+      says: 'Nuage with more breath and a gentler rise, tuned low.' },
+    { name: 'arthur', kin: 'Men', arc: ARTHUR, song: 0.53,   // "He is a fine tenor and should properly sing at 0.53"
+      says: 'The very slightest inverse of Nuage, reservedly: a Manner of Ecouter, where she is a Grace of it.' },
+    { name: 'obelus', kin: 'Men', arc: ARTHUR, tone: 1.03, speed: 0.83, song: 0.53,   // as on Obelus's own line, so that he sounds everywhere like "the one known in the application"
+      says: 'Arthur with the tape run at about four fifths: a warm, slow, fuller voice, found by throwing the line a little slow.' },
+    { name: 'rudolf', kin: 'Men', arc: ARTHUR, tone: 0.96, speed: 0.98, song: 0.61,   // "musicality is crucial to him... He is correctly set"
+      says: 'Arthur, tuned a little lower and more sung.' },
+    { name: 'blando', kin: 'Men', arc: BLANDO, song: 0.28,   // "0.28 will set his jaw correctly"
+      says: 'The human, as a jest, voiced as a computer: most of the tone and most of the time taken out, and only most.' }
+  ];
+  var PLAIN = { tone: 1, speed: 1, song: 0.34, steady: 0.79 };
+  function get(name) {
+    var i, v, k, out;
+    for (i = 0; i < CAST.length; i++) if (CAST[i].name === name) {
+      v = CAST[i]; out = {};
+      for (k in PLAIN) out[k] = PLAIN[k];
+      for (k in v) out[k] = v[k];
+      return out;
+    }
+    return null;
+  }
+
+  /* THE OPERATION, as it stands in Nuage, and not retyped. u runs 0 to 1 across the frames' time. The swell is the
+     yinyang: -cos(pi u), a black swell at the left and a white at the right, with a dot of accumulation in each. Pace
+     and pitch ride the same swell, which is the point: she does not merely rise, she rises as she quickens. Over the
+     last part of the span the swell eases to rest, a little below level, and the pace eases with it: the recalm
+     (user1: "a kerb cut back to steady flight"). Then the whole is scaled to the voice's share of the time. */
+  function arc(fr, V) {
+    if (typeof V === 'string') { var g0 = get(V); V = g0 ? g0.arc : null; }
+    if (!V) return fr.map(function (f) { var o = {}, k; for (k in f) o[k] = f[k]; return o; });
+    var sum = 0, i, out = [], acc = 0, raw = 0; for (i = 0; i < fr.length; i++) sum += fr[i].ms;
+    var dots = function (u) { return V.dot * (Math.exp(-Math.pow((u - 0.75) / 0.09, 2)) - Math.exp(-Math.pow((u - 0.25) / 0.09, 2))); };
+    var TAIL = V.tail === undefined ? 0.3 : V.tail, REST = V.rest === undefined ? -0.6 : V.rest;
+    for (i = 0; i < fr.length; i++) { var f = fr[i], u = sum ? (acc + f.ms / 2) / sum : 0.5, late = TAIL && u > 1 - TAIL ? (u - (1 - TAIL)) / TAIL : 0, ease = late * late * (3 - 2 * late), swell = (-Math.cos(Math.PI * u) + (V.dot ? dots(u) / Math.abs(V.dot) * 0.5 : 0)) * (1 - ease) + REST * ease; acc += f.ms;
+      var g = {}; for (var k in f) g[k] = f[k];
+      g.ms = f.ms * (1 - V.rateArc * swell) * (1 + 0.2 * late * late); raw += g.ms;
+      if (f.f0) g.f0 = f.f0 * V.pitch * (1 + V.pitchArc * swell + dots(u));
+      if (f.f) g.f = f.f.map(function (hz) { return hz * V.tract; });
+      if (f.at) g.at = [f.at[0] * V.tract, f.at[1] * V.tract];
+      if (f.breath) g.breath = f.breath * V.breath; if (f.hiss) g.hiss = Math.min(1, f.hiss * V.hiss);
+      out.push(g); }
+    if (V.flat || V.even) {
+      var n0 = 0, f0m = 0, msm = 0; for (i = 0; i < out.length; i++) { msm += out[i].ms; if (out[i].f0 && out[i].voice > 0.2) { f0m += out[i].f0; n0++; } } f0m = n0 ? f0m / n0 : 0; msm = out.length ? msm / out.length : 0;
+      for (i = 0; i < out.length; i++) { if (V.flat && out[i].f0 && f0m) out[i].f0 = out[i].f0 + (f0m - out[i].f0) * V.flat; if (V.even) out[i].ms = out[i].ms + (msm - out[i].ms) * V.even; } raw = 0; for (i = 0; i < out.length; i++) raw += out[i].ms; }
+    var k2 = raw ? sum * V.time / raw : 1; for (i = 0; i < out.length; i++) out[i].ms = out[i].ms * k2;
+    return out;
+  }
+
+  /* ON A SCORE. on lays a voice's arc over a score of the score ring. as carries a score in a voice entire, in the
+     order Obelus found: the arc, then the tone, then (if places are given) each word fitted to its place, then (if
+     flags are given) the lifted words, then the song, whose tonic goes with the voice. o may override the voice's
+     own dials: o.tone, o.song, o.speed, o.steady. What cannot be done to a score is left written on it for whoever
+     plays it: score.voice = { name, speed, steady }. speed is the speed of a tape; steady is taken by SCORE.say. */
+  function on(score, name) { return { codes: score.codes, word: score.word, frames: arc(score.frames, name) }; }
+  function as(score, name, o) {
+    o = o || {};
+    var v = get(name) || get('phillippe'), tn = o.tone === undefined ? v.tone : o.tone, sg = o.song === undefined ? v.song : o.song;
+    var s = S.tone(on(score, v.arc), tn);
+    if (o.slots) s = S.fit(s, o.slots, o.gaps);
+    if (o.lift) s = S.lift(s, o.lift);
+    s = S.sing(s, sg, 113.3 * (v.arc ? v.arc.pitch : 1) * tn);
+    s.voice = { name: v.name, speed: o.speed === undefined ? v.speed : o.speed, steady: o.steady === undefined ? v.steady : o.steady };
+    return s;
+  }
+
+  var VOICES = { names: CAST.map(function (v) { return v.name; }), get: get, arc: arc, on: on, as: as, PLAIN: PLAIN };
+  if (typeof module !== 'undefined' && module.exports) module.exports = VOICES;
+  else root.VOICES = VOICES;
+})(root);
+
+  // SAY: a score, sung. o.voice: a chain of settings, the house finish unless said; o.turns: as in ECOUTER.say.
+  // o.steady, or the steadiness a voice left written on the score, sets how much of the ruler is mixed in (the wear).
   root.SCORE.say = function (score, o) {
     o = o || {}; var st = E.CHAIN.settings(o.voice || E.CHAIN.PRESETS[E.CHAIN.HOUSE_NAME]);
+    var sd = o.steady !== undefined ? o.steady : (score.voice ? score.voice.steady : undefined);
+    if (sd !== undefined) st.wear = Math.round(sd * 100);
     st.frames = score.frames; return E.CHAIN.make(st, o.turns).pcm;
   };
+  root.SCORE.VOICES = root.VOICES; root.SCORE.arc = root.VOICES.on; root.SCORE.as = root.VOICES.as;   // the voices, on a score
   E.SCORE = root.SCORE; return root.SCORE;
 });
