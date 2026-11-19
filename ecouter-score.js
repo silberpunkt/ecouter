@@ -1,5 +1,5 @@
 /* ecouter-score.js -- the score ring of Ecouter: things done to a score before it is sung.
-   Written by repo.make.js on 2026-11-18 from the ecouter workshop; do not edit here.
+   Written by repo.make.js on 2026-11-19 from the ecouter workshop; do not edit here.
 
    A file beside the library, not part of it. Load ecouter.js or ecouter-speech.js first:
      <script src="ecouter-speech.js"></script>
@@ -9,6 +9,7 @@
      s = ECOUTER.SCORE.fit(s, [180, 150, 420]);        // each word made to last so many milliseconds
      s = ECOUTER.SCORE.sing(s, 0.5);                   // half way from speech to song
      var pcm = ECOUTER.SCORE.say(s);                   // and then it is sung: Float32Array, 16 kHz
+     s = ECOUTER.SCORE.fromCodes(ECOUTER.codes(text)); // or a score from the sounds themselves: whatever ECOUTER.codes can read, Bell's Visible Speech too
    And the voices, by name:
      ECOUTER.SCORE.VOICES.names                        // phillippe nuage miria lauren arthur obelus rudolf blando
      s = ECOUTER.SCORE.as(ECOUTER.SCORE.read(["Is", "it", "you"], ["", "", "?"]), "lauren");   // her arc, her tone, her song
@@ -61,6 +62,23 @@
   function sounded(c) { return /[A-Za-z]/.test(c); }       // a phoneme code, as against a space or a stop
   function copy(f) { var o = {}, k; for (k in f) o[k] = f[k]; return o; }
   function again(score, frames) { return { codes: score.codes, word: score.word, frames: frames }; }
+
+  /* FROM CODES: a score from the sounds themselves, written as ECOUTER.codes writes them ("lEHt DHEHr bIY lAYt ."),
+     whatever they were read from: English by the rules, or Bell's Visible Speech by its glyphs. Words are parted by
+     blanks, and a mark stands by itself after the word it follows. The same score as READ makes from the same sounds. */
+  function fromCodes(text, o) {
+    var codes = [], word = [], bits = String(text).split(' '), j = -1, i, k, c;
+    o = o || {};
+    for (i = 0; i < bits.length; i++) {
+      if (!bits[i]) continue;
+      if (!sounded(bits[i])) { if (j >= 0) { codes.push(bits[i]); word.push(j); codes.push(' '); word.push(j); } continue; }   // a mark: it belongs to the word before it
+      c = []; try { c = P.split(bits[i]).filter(sounded); } catch (e) {}
+      if (!c.length) continue;
+      j++; for (k = 0; k < c.length; k++) { codes.push(c[k]); word.push(j); }
+      codes.push(' '); word.push(j);
+    }
+    return { codes: codes, word: word, frames: P.frames(codes, { f0: o.f0 || 118, tune: o.tune }) };
+  }
 
   /* READ: words to a score. punct[j] is what follows word j: '.', '?', '!', ',' or nothing. A whole sentence is read
      at once, so that its words run together and it has its tune: a fall at a full stop, a lift at a question. */
@@ -163,7 +181,7 @@
     return again(score, out);
   }
 
-  var SCORE = { read: read, tone: tone, fit: fit, lift: lift, sing: sing, DEGREES: DEGREES, HEIGHT: HEIGHT };
+  var SCORE = { read: read, fromCodes: fromCodes, tone: tone, fit: fit, lift: lift, sing: sing, DEGREES: DEGREES, HEIGHT: HEIGHT };
   if (typeof module !== 'undefined' && module.exports) module.exports = SCORE;
   else root.SCORE = SCORE;
 })(root);

@@ -13,6 +13,9 @@
   button i, dt i { font-style: normal; font-family: "Segoe UI Symbol", "Noto Sans Symbols2", "Symbola", sans-serif; font-variant-emoji: text; filter: grayscale(1) brightness(1.2) contrast(1.6) }
   body { font: 15px/1.45 Iosevka, Consolas, monospace; margin: 20px auto 40px; max-width: 860px; padding: 0 16px; background: var(--bg); color: var(--ink) }
   h1 { font-size: 20px; margin: 0 10px 0 0; line-height: 1; display: flex; align-items: center } .logo { flex: none; display: block; color: var(--ink) }
+  .grp { display: inline-flex; gap: 8px; align-items: center } #bell-v, #bell-c { display: inline-flex; gap: 4px }
+  #bell-u { width: 15em } #bell-v select { width: 3.6em } #bell-c select { width: 5.6em } #bell-es { width: 15em }     /* the five letters keep their width and their place */
+  #sample { width: 15em }
   select { font: inherit; color: var(--ink); background: var(--btn); border: 1px solid var(--edge); border-radius: 2px; padding: 3px 6px; cursor: pointer } option { background: var(--pane); color: var(--ink) } h2 { font-size: 15px; margin: 16px 0 2px; color: var(--ink) } p { margin: 6px 0; color: var(--dim) }
   a { color: var(--edge) }
   body { --sample: 31px }
@@ -42,7 +45,7 @@
   .panel { border: 1px solid var(--line); background: var(--pane); padding: 10px 16px 12px; margin: 10px 0 }
   .panel .row { margin: 0 0 4px } .panel h2 { margin: 0 }
   dl.secs { display: grid; grid-template-columns: 2.2em 1fr; gap: 8px 10px; margin: 6px 0 0 } dl.secs dt { text-align: center; font-size: 1.25em; line-height: 1.2; color: var(--ink) } dl.secs dd { margin: 0; color: var(--dim) } dl.secs dd b { color: var(--ink); font-weight: 600 }
-  p.key { margin-top: 10px; font-size: 13px }
+  p.foot { margin-top: 18px; color: var(--dim) }     /* the footer: at the size of the labels, a sentence to a line */
 </style>
 <div class="row"><h1><!-- the sign: made by logo.make.js from Eniee Slender; the page colors its letters itself --><svg class="logo" viewBox="0 -760 5107 950" width="132.8" height="24.7" role="img" aria-label="Ecouter"><path d="M30.8 -491.2H1013.2A491.2 491.2 0 0 1 30.8 -491.2Z" fill="none" stroke="currentColor" stroke-width="61.5" stroke-linejoin="round"/><g transform="translate(1294 0)" fill="currentColor"><path class="lg" d="M55 -14C56 -11 401 -11 410 -14C434 -23 479 -63 485 -81C488 -91 502 -90 314 -90H145V-325H250C369 -325 360 -324 380 -338C413 -359 443 -393 437 -401C435 -403 415 -404 290 -404H145V-610H274C419 -610 407 -609 428 -621C460 -642 492 -678 485 -686C483 -688 461 -688 308 -688L133 -687L124 -683C104 -673 75 -649 62 -631L55 -621V-319C54 -152 55 -15 55 -14Z"/><path class="lg" d="M740 4C806 14 874 -13 934 -72C970 -108 998 -162 981 -164C961 -166 902 -116 895 -89C892 -77 892 -77 875 -74C789 -59 717 -111 697 -203C678 -292 692 -432 721 -440C796 -459 872 -435 888 -388C892 -374 895 -373 913 -383C946 -400 981 -436 980 -451C974 -505 899 -535 810 -520C726 -505 640 -430 613 -347C592 -283 593 -168 615 -106C637 -43 681 -4 740 4Z"/><path class="lg" d="M1274 4C1360 14 1463 -37 1529 -122C1578 -186 1596 -271 1578 -363C1549 -522 1385 -581 1241 -486C1155 -429 1107 -355 1098 -264C1084 -117 1154 -11 1274 4ZM1422 -78C1411 -75 1370 -73 1359 -75C1247 -88 1182 -177 1188 -309C1190 -372 1210 -431 1232 -441C1295 -469 1391 -448 1439 -396C1502 -327 1514 -180 1462 -98C1456 -88 1445 -83 1422 -78Z"/><path class="lg" d="M1836 4C1900 13 1978 -21 2050 -89L2064 -101V1H2069C2085 3 2140 -40 2151 -62L2154 -69V-295L2153 -522H2147C2134 -521 2104 -501 2082 -478C2062 -457 2064 -474 2064 -318V-184L2059 -172C2029 -97 2002 -75 1941 -75C1855 -75 1803 -117 1788 -199C1785 -216 1784 -220 1784 -369L1783 -522H1776C1759 -521 1707 -481 1696 -459L1693 -452L1694 -298C1694 -126 1694 -129 1705 -97C1726 -38 1767 -6 1836 4Z"/><path class="lg" d="M2475 -1C2513 6 2578 -6 2615 -26C2660 -52 2700 -106 2665 -94C2623 -79 2608 -76 2580 -77C2525 -80 2493 -104 2482 -152C2476 -177 2476 -187 2477 -390V-437H2537C2604 -437 2601 -436 2621 -449C2653 -470 2684 -505 2677 -513C2676 -515 2662 -515 2578 -515H2480L2481 -588C2482 -645 2482 -661 2480 -663C2473 -672 2426 -642 2404 -615C2391 -598 2391 -600 2391 -555V-515H2368C2333 -515 2303 -498 2275 -463C2254 -436 2253 -437 2328 -437H2389L2388 -384C2386 -291 2385 -130 2387 -111C2392 -47 2421 -11 2475 -1Z"/><path class="lg" d="M2963 4C3026 13 3093 -6 3146 -49C3211 -102 3213 -140 3148 -90C3115 -65 3037 -66 2979 -94C2931 -117 2901 -161 2886 -228L2883 -245H3026L3169 -246L3179 -251C3209 -265 3246 -302 3248 -320C3250 -350 3233 -423 3217 -451C3167 -541 3036 -559 2932 -490C2834 -425 2788 -344 2788 -237C2788 -95 2849 -11 2963 4ZM3146 -329 3147 -324H2878V-331C2884 -378 2893 -408 2911 -433C2929 -460 3016 -460 3068 -434C3108 -415 3138 -374 3146 -329Z"/><path class="lg" d="M3358 0C3365 8 3403 -15 3428 -42C3450 -64 3448 -50 3448 -184V-300L3451 -319C3462 -373 3492 -436 3508 -440C3580 -462 3638 -434 3647 -373L3649 -361L3654 -360C3670 -359 3724 -401 3735 -424C3743 -440 3732 -474 3713 -496C3660 -552 3539 -526 3457 -441L3448 -431L3447 -476V-522H3440C3423 -521 3371 -481 3360 -459L3357 -452V-226C3357 -102 3358 0 3358 0Z"/></g></svg></h1><button id="b-about" title="What Ecouter is, and what this page is made of."><i>&#x2139;&#xFE0E;</i> About</button><button id="b-howto" title="How to use this page."><i>&#x2637;&#xFE0E;</i> Howto</button><span class="gap"></span><span class="lbl">Theme:</span><span class="lights seg"><button data-light="day" title="The normal state of all applications and websites in the past."><i>&#x2600;&#xFE0E;</i> Day</button><button data-light="dusk" title="Dark mode. Diminished contrast, much diminished flux."><i>&#x25D0;&#xFE0E;</i> Dusk</button><button data-light="night" class="on" title="Black and white, with grey lines."><i>&#x263D;&#xFE0E;</i> Night</button></span><span class="lbl">Sample:</span><span class="seg"><button id="smaller" title="The words smaller, in both boxes.">-</button><button id="larger" title="The words larger, in both boxes.">+</button></span></div>
 
@@ -52,6 +55,7 @@
 <dt><i>&#x1F4A1;&#xFE0E;</i></dt><dd><b>What it is.</b> Ecouter is a tiny English text-to-speech in one file. It was built to color text by the tone a voice would give it, once looked up. It does not have to sound out, but it can, rather well.</dd>
 <dt><i>&#x1F4D6;&#xFE0E;</i></dt><dd><b>How it reads.</b> By the 355 letter-to-sound rules of NRL Report 7948 (1976), which have been public since 1985. The sentence is given a tune, and a small formant throat sings it. Nothing is recorded and nothing is looked up elsewhere.</dd>
 <dt><i>&#x1F3A8;&#xFE0E;</i></dt><dd><b>The color.</b> Each letter takes the color of the tone the voice would give it. Flat is green. A question lifts toward blue, an exclamation drops toward red. The same text gives the same colors every time.</dd>
+<dt><i>&#x1F514;&#xFE0E;</i></dt><dd><b>A.M. Bell.</b> Alexander Melville Bell drew Visible Speech in 1867 as pictures of the mouth, so that a sound could be read without having been heard, in any tongue. Here each of his signs is three keyboard characters. Choose an A.M. Bell sample and the Bell codes alone go in the box: Ecouter speaks them from the glyphs, through the same mouth, and colors them by the same tones. His forms can write any tongue. This voice has only English sounds yet, so the Spanish here is said by an English mouth.</dd>
 <dt><i>&#x25CE;&#xFE0E;</i></dt><dd><b>The rings.</b> The library is the pearl: English in, samples out. About it are rings, each a small file of its own. The score ring works on a sentence before it is sung, and holds the voices by name. The player ring treats the sound as a tape, and reads it with a head. This page uses all three.</dd>
 <dt><i>&#x1F512;&#xFE0E;</i></dt><dd><b>What it keeps.</b> Your choices and your words, in this browser and nowhere else, so that they are here when you come back. Nothing is sent anywhere, and everything is made in your browser. Reset puts the choices back as they first were, and leaves your words alone.</dd>
 <dt><i>&#x25E1;&#xFE0E;</i></dt><dd><b>The sign.</b> A lower hemicircle: an open mouth, speaking and perhaps smiling. Beside it the word, set in <a href="https://github.com/silberpunkt/eniee">Eniee Slender</a> and wearing its own coloring.</dd>
@@ -62,19 +66,25 @@
 <div id="howto" class="panel" hidden>
 <div class="row"><h2>Howto</h2><span class="gap"></span><button class="x" title="Close.">X</button></div>
 <dl class="secs">
-<dt><i>&#x2328;&#xFE0E;</i></dt><dd><b>Write.</b> Type in either box, or choose a Text Sample. The lower box colors as you type. Sample - and + size the words in both.</dd>
+<dt><i>&#x2328;&#xFE0E;</i></dt><dd><b>Write.</b> Type in either box, or choose a Text Sample or an A.M. Bell sample. The lower box colors as you type. Sample - and + size the words in both.</dd>
 <dt><i>&#x1F3A8;&#xFE0E;</i></dt><dd><b>Color.</b> Choose a tint. Omnia spreads the voice's range over the whole wheel. Viriditas is the quiet reading mode and stays near green. Vivificat is between. A background lights the room behind the letters.</dd>
 <dt><i>&#x1F5E3;&#xFE0E;</i></dt><dd><b>Choose a voice.</b> Each is Ecouter, differently carried, and opens on its own four dials. Move them as you like. Voice's own puts them back.</dd>
-<dt><i>&#x25B6;&#xFE0E;</i></dt><dd><b>Say.</b> The text is sung and played. Speed can be moved while it plays. The other dials sing it again.</dd>
+<dt><i>&#x25B6;&#xFE0E;</i></dt><dd><b>Say.</b> The text is sung and played, from where the head stands. Reverse plays it backward. Pause rests the head where it is, and Stop sets it back at the start. Speed can be moved while it plays. The other dials sing it again.</dd>
 <dt><i>&#x270B;&#xFE0E;</i></dt><dd><b>Take hold.</b> Drag the playhead, the wave or the spectrogram. The voice goes with your hand, backward too.</dd>
 <dt><i>&#x2702;&#xFE0E;</i></dt><dd><b>Take it apart.</b> The finish is eight parts. Turn them off one by one and hear what the sound is at heart. It tries. It is basic.</dd>
 <dt><i>&#x1F4BE;&#xFE0E;</i></dt><dd><b>Save.</b> A .wav of the tape, at the speed set. The room after the head is not in it.</dd>
 </dl>
 </div>
 
-<div class="row" style="margin-bottom:0"><label class="lbl" for="sample">Text Sample:</label><select id="sample" title="A passage to try, short or long. Your own words go in the box below."></select></div>
-<textarea id="t" spellcheck="false">Is it you? It is you! It's not only everyone; it's you, too.</textarea>
+<div class="row" style="margin-bottom:0; row-gap:6px"><label class="lbl" for="sample">Text Sample:</label><select id="sample" autocomplete="off" title="A passage to try, short or long. Your own words go in the box below."></select><span class="grp"><label class="lbl" for="bell-u">A.M. Bell Samples:</label><select id="bell-u" class="bell" title="Great utterances, written in Alexander Melville Bell's Visible Speech: each sound is three keyboard characters. Choose one and its Bell codes go in the box; Ecouter speaks them from the glyphs."></select></span><span class="grp"><span class="lbl">Vowels:</span><span id="bell-v"></span></span><span class="grp"><span class="lbl">Consonants:</span><span id="bell-c"></span></span><span class="grp"><label class="lbl" for="bell-es">Spanish:</label><select id="bell-es" class="bell" title="Spanish, written in Bell's Visible Speech and said by an English mouth: this voice has only English sounds yet. Choose a line and its Bell codes go in the box."></select></span></div>
+<textarea id="t" spellcheck="false" autocomplete="off">Is it you? It is you! It's not only everyone; it's you, too.</textarea>
 <div id="lit" contenteditable="true" spellcheck="false" title="The same line, each letter in the color of its pitch. Type here too."></div>
+
+<h2>Playback</h2>
+<div class="row"><button id="say" title="Sing the text in this voice and play it, from where the head stands. At the end of the tape, from the start."><i>&#x25B6;&#xFE0E;</i> Say</button><button id="reverse" title="The same, backward, from where the head stands. At the start of the tape, from the end."><i>&#x25C0;&#xFE0E;</i> Reverse</button><button id="stop" title="Stop, and set the head back at the start."><i>&#x25A0;&#xFE0E;</i> Stop</button><button id="pause" title="Rest the head where it is. Press again to go on, the way it was going."><i>&#x23F8;&#xFE0E;</i> Pause</button><button id="save" title="The tape as it would be heard at this speed, written to a .wav file. The room after the head is not in it."><i>&#x1F4BE;&#xFE0E;</i> Save</button><span id="out"></span></div>
+<input id="ph" type="range" min="0" max="1000" step="1" value="0" title="The playhead. Drag it and the voice goes with it.">
+<div class="graph" id="g1" title="The tape: the sound as a strip. Take hold of it and drag."><canvas id="wave" height="110"></canvas><i class="head"></i></div>
+<div class="graph" id="g2" title="The spectrogram of the sound, with the pitch of the score drawn over it in its own color. Take hold of it and drag."><canvas id="spec" height="200"></canvas><i class="head"></i></div>
 
 <h2>Coloring choices</h2>
 <div class="row"><span class="lbl">Tint:</span><span class="modes seg"><button data-mode="none" title="The text as it is, to compare in place.">None</button><button data-mode="viriditas" title="Green at rest. One turn of the wheel an octave, mixed into white."><i>&#x1F333;&#xFE0E;</i> Viriditas</button><button data-mode="omnia" class="on" title="The same tilts told over the whole wheel. The mix goes all the way to color."><i>&#x1F3A8;&#xFE0E;</i> Omnia</button><button data-mode="vivificat" title="A blend of both, leaning to Omnia by 62 hundredths."><i>&#x1F58C;&#xFE0E;</i> Vivificat</button></span></div>
@@ -88,12 +98,7 @@
 <div class="row" id="toggles" title="The finish, part by part. Each lit is in the chain."><span class="lbl">Finishes:</span></div>
 <div class="row"><span class="lbl">Reset choices:</span><button id="reset" title="Every choice on this page put back as it first was: theme, size, coloring, voices and their dials, the finish. Your words are left alone.">Reset</button></div>
 
-<h2>Playback</h2>
-<div class="row"><button id="say" title="Sing the text in this voice and play it from the start."><i>&#x25B6;&#xFE0E;</i> Say</button><button id="stop" title="Rest the head where it is."><i>&#x25A0;&#xFE0E;</i> Stop</button><button id="save" title="The tape as it would be heard at this speed, written to a .wav file. The room after the head is not in it."><i>&#x1F4BE;&#xFE0E;</i> Save</button><span id="out"></span></div>
-<input id="ph" type="range" min="0" max="1000" step="1" value="0" title="The playhead. Drag it and the voice goes with it.">
-<div class="graph" id="g1" title="The tape: the sound as a strip. Take hold of it and drag."><canvas id="wave" height="110"></canvas><i class="head"></i></div>
-<div class="graph" id="g2" title="The spectrogram of the sound, with the pitch of the score drawn over it in its own color. Take hold of it and drag."><canvas id="spec" height="200"></canvas><i class="head"></i></div>
-<p class="key">Two views of one sound, on one clock: the wave, then its spectrogram, low at the foot. The grey is the sound itself. The colored lines are the pitch the score asked for, on the fundamental and its first two harmonics. They lie on the grey bands because they are the same pitch.</p>
+<p class="foot">Two views of one sound, on one clock: the wave, then its spectrogram, low at the foot.<br>The grey is the sound itself.<br>The colored lines are the pitch the score asked for, on the fundamental and its first two harmonics.<br>They lie on the grey bands because they are the same pitch.</p>
 
 <script src="ecouter.js"></script>
 <script src="ecouter-score.js"></script>
@@ -170,23 +175,23 @@ ORDER.forEach(function (n) {
   var v = S.VOICES.get(n), b = document.createElement("button"); b.textContent = n.charAt(0).toUpperCase() + n.slice(1); b.title = v.says; b.setAttribute("data-voice", n); b.classList.toggle("on", n === voiceName);
   b.onclick = function () {       // what a voice remembers: its dials as they were left, while the page is open
     PER[voiceName] = dials; voiceName = n; dials = PER[n] || own(n); each("#voices button", function (x) { x.classList.toggle("on", x === b); });
-    showDials(); if (p) p.pace(dials.speed); changed();
+    showDials(); if (p) p.pace(paceNow()); changed();
   };
   $("voices").appendChild(b);
 });
 DIALS.forEach(function (d) {
   var l = document.createElement("label"), r = document.createElement("input"), v = document.createElement("b");
   l.title = d[4]; l.appendChild(document.createTextNode(d[1])); r.type = "range"; r.min = d[2]; r.max = d[3]; r.step = 0.01; r.id = "d-" + d[0]; v.id = "v-" + d[0]; l.appendChild(r); l.appendChild(v);
-  r.addEventListener("input", function () { dials[d[0]] = +r.value; v.textContent = (+r.value).toFixed(2); if (d[0] === "speed" && p) p.pace(dials.speed); });
+  r.addEventListener("input", function () { dials[d[0]] = +r.value; v.textContent = (+r.value).toFixed(2); if (d[0] === "speed" && p) p.pace(paceNow()); });
   r.addEventListener("change", function () { if (d[0] !== "speed") changed(); });
   $("dials").appendChild(l);
 });
 (function () { var b = document.createElement("button"); b.id = "own"; b.textContent = "Voice's own"; b.title = "Put this voice's four dials back as Ecouter has them.";
-  b.onclick = function () { dials = own(voiceName); showDials(); if (p) p.pace(dials.speed); changed(); }; $("voicerow").appendChild(b); })();
+  b.onclick = function () { dials = own(voiceName); showDials(); if (p) p.pace(paceNow()); changed(); }; $("voicerow").appendChild(b); })();
 showDials();
 // THE FINISH, PART BY PART (user1, 18 xi 2026: "the button-row in Say is an evolutionary choicemap which defines basic Ecouter,
 // hard won by many tests... Turn off all the buttons in order and see what sound is at heart. It tries. It is basic.")
-var TOGGLES = [["gust", "Gust", "The spectrogram blurred a little and sound-matched."], ["stocking", "Silk Stocking", "A shelf down above 4 kHz."], ["entone", "Entone", "A comb on the score's own pitch."], ["ess", "Ess", "A standard 'de-esser'."], ["govern", "Governor", "Holds what stands above 5.5 kHz within hearing."], ["mellow", "Mellow", "A kind microphone. Highs softened, a small lift below 250 Hz, and the echo of a small room. This room is on the tape."], ["conduction", "Conduction", "The tune. Each sentence begins high, sags a little, and returns to level. Without it the voice falls a fifth across the whole, and sounds defeated."], ["fgl", "4x FGL", "The fast search of Perraudin (2013). Ten turns with momentum replace forty. Judge by ear."]];
+var TOGGLES = [["gust", "Gust", "The spectrogram blurred a little and sound-matched."], ["stocking", "Stocking", "A silk stocking over the microphone: a shelf down above 4 kHz."], ["entone", "Entone", "A comb on the score's own pitch."], ["ess", "Ess", "A standard 'de-esser'."], ["govern", "Governor", "Holds what stands above 5.5 kHz within hearing."], ["mellow", "Mellow", "A kind microphone. Highs softened, a small lift below 250 Hz, and the echo of a small room. This room is on the tape."], ["conduction", "Conduction", "The tune. Each sentence begins high, sags a little, and returns to level. Without it the voice falls a fifth across the whole, and sounds defeated."], ["fgl", "4x FGL", "The fast search of Perraudin (2013). Ten turns with momentum replace forty. Judge by ear."]];
 var chain = E.CHAIN.settings(E.CHAIN.PRESETS[E.CHAIN.HOUSE_NAME]);
 TOGGLES.forEach(function (tg) {
   var b = document.createElement("button"); b.textContent = tg[1]; b.title = tg[2]; b.setAttribute("data-part", tg[0]); b.classList.toggle("on", !!chain[tg[0]]);
@@ -203,7 +208,7 @@ $("resound").onclick = function () { resound = !resound; this.classList.toggle("
 var p = null, tape = null, whole = null, madeKey = "", run = 0, canWork = typeof Worker === "function" && location.protocol !== "file:", looping = false, held = false, wasOn = false, note = "", how = "";
 var lineF = null, lineV = null, words = [], specImg = null, specTop = 640, home = 118;
 function player() {       // made on the first press: a browser will not start sound until the person has pressed something
-  if (!p) { p = PL.open({ resound: resound }); p.speed = dials.speed; p.onend = function () { drawHead(); status(); };
+  if (!p) { p = PL.open({ resound: resound }); p.speed = paceNow(); p.onend = function () { paused = false; lamps(); drawHead(); status(); };
     if (p.silent) note = " This browser gave no sound device, so nothing is heard here; the pictures are still drawn, and Save still writes the sound to a file.";
     if (tape) p.load(tape); }
   p.wake(); return p;
@@ -220,18 +225,31 @@ function sentences(text) {
   return out;
 }
 function key() { return JSON.stringify([$("t").value, voiceName, dials.tone, dials.song, dials.steady, finish, TOGGLES.map(function (tg) { return !!chain[tg[0]]; })]); }
+// THE SECOND PATH, for Bell. A text that holds Bell's glyphs is not cut into English words here: it is handed to the library
+// whole, a line at a time, and the library reads it, glyphs and any English beside them, into the sounds themselves. Each
+// line is cut at its full stops, and each piece is a stretch of the tape.
+function codeSentences(text) {
+  var out = [];
+  text.split("\n").forEach(function (line) {
+    if (!line.trim()) return; var bits = E.codes(line).trim().split(" "), cur = [], i;
+    for (i = 0; i < bits.length; i++) { if (!bits[i]) continue; cur.push(bits[i]); if (bits[i] === "." || bits[i] === "?" || bits[i] === "!") { out.push(cur.join(" ")); cur = []; } }
+    if (cur.length) out.push(cur.join(" "));
+  });
+  return out.filter(function (c) { return /[A-Za-z]/.test(c); });
+}
 // MAKING THE TAPE: each sentence read, carried in the voice and sung, in a worker of its own; where workers cannot start,
 // one by one with the page let breathe between. Each sentence is a stretch of the tape. (A page opened from a file may not
 // start a worker from a file beside it, and a browser says so in its console; so there the page does not try.)
 function make(thenSay) {
-  var mine = ++run, list = sentences($("t").value), k = key(), t0 = Date.now(), got = [], left = list.length, st = chainNow();
+  var text = $("t").value, bell = !!(E.BELL && E.BELL.has(text)), mine = ++run, list = bell ? codeSentences(text) : sentences(text), k = key(), t0 = Date.now(), got = [], left = list.length, st = chainNow();
   if (p) p.stop();
   if (!list.length) { $("out").textContent = "nothing to say"; return; }
   $("out").textContent = "making " + list.length + (list.length === 1 ? " sentence" : " sentences");
   function back(r) { if (mine !== run) return; got[r.n] = r; if (--left === 0) done(); }
   function here(job) { setTimeout(function () { if (mine === run) back(ecouterSing(job)); }, 0); }
   list.forEach(function (sn, n) {
-    var job = { n: n, words: sn.words, punct: sn.punct, quote: sn.quote, voice: voiceName, tone: dials.tone, song: dials.song, steady: dials.steady, chain: st };
+    var job = bell ? { n: n, codes: sn, voice: voiceName, tone: dials.tone, song: dials.song, steady: dials.steady, chain: st }
+      : { n: n, words: sn.words, punct: sn.punct, quote: sn.quote, voice: voiceName, tone: dials.tone, song: dials.song, steady: dials.steady, chain: st };
     if (canWork) {
       try {
         var w = new Worker("index.worker.js");
@@ -265,7 +283,16 @@ function make(thenSay) {
   }
 }
 function changed() { if (tape || run) make(!!(p && p.on)); }     // a voice, a dial or a part of the finish was changed: sung again, and said again if it was being said
-function sayNow() { player(); p.seek(tape.bounds[0]); p.play(dials.speed); watch(); }
+// SAY AND REVERSE (user1, 19 xi 2026: "Because of Ecouter's scrubbability... a Reverse button after Playback > Say, with a reversed
+// triangle, then stop and pause. There's no need for Repeat, the user's cursor will be poised."). The tape has a way it is
+// going: forward from its start, or backward from its end. Speed is how fast; the way is kept apart from it.
+var way = 1, paused = false;
+function paceNow() { return way * dials.speed; }
+function lamps() { $("pause").classList.toggle("on", paused); }
+// They pick up from where the head stands (user1: "If the user has the playhead positioned, it makes sense to let Play (and Reverse)
+// pick up from that point"); a head with no tape left before it begins from the far end, which the head sees to itself.
+function sayNow() { player(); paused = false; lamps(); p.play(paceNow()); watch(); }
+function go(w) { way = w; player(); if (madeKey !== key()) make(true); else sayNow(); }
 function status() {
   if (!tape) return;
   var where = p ? p.where() : 0, thread = !p || p.silent ? "" : p.thread === "audio" ? " The head is on the audio thread." : p.thread === "page" ? " The head is on the painting thread: this browser has no AudioWorklet." : "";
@@ -342,8 +369,13 @@ function drawHead() {
 // the pictures move only while there is something to show: a head at rest costs the page nothing
 function loop() { drawHead(); status(); if (p && (p.on || held)) requestAnimationFrame(loop); else { looping = false; drawHead(); } }
 function watch() { if (!looping) { looping = true; requestAnimationFrame(loop); } }
-$("say").onclick = function () { player(); if (madeKey !== key()) make(true); else sayNow(); };
-$("stop").onclick = function () { if (p) { p.stop(); setTimeout(function () { drawHead(); status(); }, 80); } };
+$("say").onclick = function () { go(1); }; $("reverse").onclick = function () { go(-1); };
+$("stop").onclick = function () { if (p && tape) { paused = false; lamps(); p.stop(); p.seek(tape.bounds[0]); setTimeout(function () { drawHead(); status(); }, 80); } };
+$("pause").onclick = function () {
+  if (!p || !tape) return;
+  if (p.on) { p.stop(); paused = true; } else if (paused) { paused = false; p.play(paceNow()); watch(); }
+  lamps(); setTimeout(function () { drawHead(); status(); }, 80);
+};
 $("t").addEventListener("keydown", function (e) { if (e.key === "Enter" && e.ctrlKey) { e.preventDefault(); $("say").onclick(); } });
 $("save").onclick = function () {
   if (!tape || !dials.speed) return;
@@ -375,10 +407,59 @@ var SAMPLES = [
   ["Chaucer's Yeoman", "Upon his arm he bare a gai bracer, / And by his side a sword and a buckler, / And on that other side a fitting daggere, / Harnessed well, and sharp as point of spear: / A Christopher on his breast of silver sheen. / An horn he bare, the baldric was of green: / A forester was he soothly as I guess."],     // given in quotation marks, and they were taken off at his word: quoted words are lifted, and "That is speech, not song"
   ["Emma's Colossus", "Here at our sea-washed, sunset gates shall stand / A mighty woman with a torch, whose flame / Is the imprisoned lightning, and her name / Mother of Exiles. From her beacon-hand / Glows world-wide welcome; her mild eyes command / The air-bridged harbor that twin cities frame.\n\"Keep, ancient lands, your storied pomp!\" cries she / With silent lips. \"Give me your tired, your poor, / Your huddled masses yearning to breathe free, / The wretched refuse of your teeming shore.\nSend these, the homeless, tempest-tost to me, / I lift my lamp beside the golden door!\""]
 ].map(function (x) { return [x[0], x[1].split(/\s*\/\s*/).join("\n")]; });
-SAMPLES.forEach(function (x, i) { var o = document.createElement("option"); o.value = i; o.textContent = x[0]; $("sample").appendChild(o); });
-function whichSample() { var i, t = $("t").value, at = -1; for (i = 0; i < SAMPLES.length; i++) if (SAMPLES[i][1] === t) at = i; $("sample").selectedIndex = at; }   // none shown, when the words are the visitor's own
-$("sample").onchange = function () { var x = SAMPLES[+this.value]; if (!x) return; $("t").value = x[1]; tint(); make(!!(p && p.on)); };
+function whichSample() {
+  var t = $("t").value;
+  (typeof bellMenus === "undefined" ? [] : bellMenus).forEach(function (m) {
+    var k, on = 0, NB = String.fromCharCode(160); for (k = 0; k < m.items.length; k++) if (m.items[k][1] === t) on = k + 1;
+    if (m.fixed) { for (k = 0; k < m.items.length; k++) m.sel.options[k + 1].textContent = (k + 1 === on ? "\u25B8" : NB) + NB + m.labels[k]; if (m.last && on) m.sel.options[0].textContent = m.items[on - 1][0]; m.sel.selectedIndex = 0; }     // its letter stays; the line in the box is marked
+    else m.sel.selectedIndex = on;
+  });
+}
 $("t").addEventListener("input", whichSample); $("lit").addEventListener("input", whichSample);
+
+// ---------- the A.M. Bell samples ----------
+// user1, 19 xi 2026: "A.M. Bell Samples: [Great Utterances] Vowels: [A] [I] [U] [E] [O]", and then the consonants by their places. Each item shows the words and then the
+// Bell codes, "rigorous retention of both columns"; and "When I select one... The Bell codes alone land in the Input
+// box, and then the colored version." The utterances are his sheet. The vowel phrases are his English; their Bell was written by
+// an encoder and every line read back by the library's own decoder (bell.samples.make.js, in the workshop).
+/*BELL-SAMPLES*/var BELLS = {"utterances":[["Let there be light","(:) >|; [^]   (') >|; (r)   .-] >|'   (:) <|, >|\" [^]"],["Fiat lux","..) >|'   <|, [^]   (:) <+' [.. (^}"],["What hath God wrought","{-) <|; [^]   (o) >|, (^)   [-. <|, [']   (r) <+; [^]"],["Mary had a little lamb","{-] >|; (r) >|'   (o) >|, [']   x|:   (:) >|\" [^] x|: (:)   (:) >|, {-]"],["Mr. Watson, come here.","{-] >|\" (^} [^] x|: (r)   {-) <|, [^] (^} x|: ['}   [.. <|; {-]   (o) >|' (r)"],["I want to see you.","<|, >|\"   {-) <|, ['} [^]   [^] <+'   (^} >|'   (|) <+'"],["Eureka","(|) <+\" (r) >|' [.. x|:"],["Amen","<|,   {-] >|; ['}"],["Shalom","(_} <|,   (:) <+: {-]"],["Aloha","x|:   (:) <+:   (o) <|,"]],"vowels":{"A":[["Aye-Aye, sir!","<|, >|\"   <|, >|\" ,   (^} x|: (r) !"],["Ay, you!",">|: ,   (|) <+' !"],["Ah, I see.","<|. ,   <|, >|\"   (^} >|' ."],["Aah, perhaps so.","<|. <|. ,   ..] x|: (r) (o) >|, ..] (^}   (^} <+: ."],["Aaah, much better.","<|. <|. <|. ,   {-] <|; [^] (_}   .-] >|; [^] x|: (r) ."],["Ach, my loch.","<|, (.. ,   {-] <|, >|\"   (:) <+; (.. ."]],"I":[["If you say so.",">|\" ..)   (|) <+'   (^} >|:   (^} <+: ."]],"U":[["Uh, I see.","<|: ,   <|, >|\"   (^} >|' ."],["Ooh, look at that.","<+' <+' ,   (:) <+\" [..   >|, [^]   (') >|, [^] ."]],"E":[["Eee! Look out!",">|' >|' !   (:) <+\" [..   <|, <+\" [^] !"],["Eyy, I'm not alone.",">|: ,   <|, >|\" {-]   ['} <|, [^]   x|: (:) <+: ['} ."],["Eh, I'd rather not.",">|; ,   <|, >|\" [']   (r) >|, (') x|: (r)   ['} <|, [^] ."],["Ecch, that's madness.",">|; (.. ,   (') >|, [^] (^}   {-] >|, ['] ['} x|: (^} ."],["Everything's great.",">|; .-) (r) >|' (^) >|\" [-} ('}   [-. (r) >|: [^] ."]],"O":[["Oh, I see.","<+: ,   <|, >|\"   (^} >|' ."],["Ought I to?","<+; [^]   <|, >|\"   [^] <+' ?"]]},"consonants":{"Lip":[["Fie, for shame!","..) <|, >|\" ,   ..) <+; (r)   (_} >|: {-] !"],["Very well, then.",".-) >|; (r) >|'   {-) >|; (:) ,   (') >|; ['} ."],["Why, of course!","{.) <|, >|\" ,   <|; .-)   [.. <+; (r) (^} !"],["Well, well, well.","{-) >|; (:) ,   {-) >|; (:) ,   {-) >|; (:) ."],["Pish, posh!","..] >|\" (_} ,   ..] <|, (_} !"],["Bah, humbug!",".-] <|, ,   (o) <|; {-] .-] <|; [-. !"],["My, my, my.","{-] <|, >|\" ,   {-] <|, >|\" ,   {-] <|, >|\" ."]],"Front":[["Yes, yes, I know.","(|) >|; (^} ,   (|) >|; (^} ,   <|, >|\"   ['} <+: ."],["Shush, she sleeps.","(_} <|; (_} ,   (_} >|'   (^} (:) >|' ..] (^} ."],["Switch pleasure.","(^} {-) >|\" [^] (_}   ..] (:) >|; (|} x|: (r) ."]],"Point":[["Thanks, I think.","(^) >|, [-} [.. (^} ,   <|, >|\"   (^) >|\" [-} [.. ."],["There, there.","(') >|; (r) ,   (') >|; (r) ."],["So, so sorry.","(^} <+: ,   (^} <+:   (^} <|, (r) >|' ."],["Zounds, zero!","('} <|, <+\" ['} ['] ('} ,   ('} >|' (r) <+: !"],["Tut, tut.","[^] <|; [^] ,   [^] <|; [^] ."],["Dear, dear me.","['] >|' (r) ,   ['] >|' (r)   {-] >|' ."],["No, no, never.","['} <+: ,   ['} <+: ,   ['} >|; .-) x|: (r) ."],["La, la, lovely.","(:) <|, ,   (:) <|, ,   (:) <|; .-) (:) >|' ."],["Right, right away.","(r) <|, >|\" [^] ,   (r) <|, >|\" [^]   x|: {-) >|: ."]],"Back":[["Come, come.","[.. <|; {-] ,   [.. <|; {-] ."],["Good gracious!","[-. <+\" [']   [-. (r) >|: (_} x|: (^} !"],["Going, going, gone.","[-. <+: >|\" [-} ,   [-. <+: >|\" [-} ,   [-. <+; ['} ."],["Och, aye.","<+; (.. ,   <|, >|\" ."],["Ha, ha, how droll.","(o) <|, ,   (o) <|, ,   (o) <|, <+\"   ['] (r) <+: (:) ."]]},"spanish":[["Pol eso alli","..] <+: (:)   >|: (^} <+:   x|. (|) >|'"],["¡Hola! ¿Qué tal?","<+: (:) <|, !   [.. >|:   [^] <|, (:) ?"],["Buenos días.",".-] {-) >|: ['} <+: (^}   ['] >|' <|, (^} ."],["Muchas gracias.","{-] <+' [^] (_} <|, (^}   [-. (r) <|, (^} (|) <|, (^} ."],["¡Ojo! ¡Ajá!","<+: (.. <+: !   <|, (.. <|, !"],["Mañana, mañana.","{-] <|, ['} (|) <|, ['} <|, ,   {-] <|, ['} (|) <|, ['} <|, ."],["¿Dónde está la luna?","['] <+: ['} ['] >|:   >|: (^} [^] <|,   (:) <|,   (:) <+' ['} <|, ?"],["Sí, se puede.","(^} >|' ,   (^} >|:   ..] {-) >|: ['] >|: ."],["Hasta luego.","<|, (^} [^] <|,   (:) {-) >|: [-. <+: ."],["En un lugar de la Mancha.",">|: ['}   <+' ['}   (:) <+' [-. <|, (r)   ['] >|:   (:) <|,   {-] <|, ['} [^] (_} <|, ."]]};/*END-BELL-SAMPLES*/
+var bellMenus = [];
+function bellMenu(sel, title, items, how) {
+  // how.codes: show both columns in the list ("rigorous retention of both columns"): the words first, set to one width, and then the
+  // Bell codes. The words lead because a browser may cut a long list off at the right (LibreWolf does, user1, 19 xi 2026), and what is
+  // cut should be the end of the codes and never the words: "lead each example with the words, then as many spaces as necessary, then
+  // such Bell-forms as will left-align and fit." The Great Utterances show their words only: "Their bell-forms can be left to appear
+  // only in the entry-box." how.fixed: the menu goes on showing its own name, so that the five letters stay where they are and one
+  // can be tried after another; the line that is in the box is marked in the list instead. how.last: its name is the phrase last
+  // chosen from it, or its first ("Spanish: [ -first or last-selected phrase- ]").
+  var wide = 0, NB = String.fromCharCode(160), o = document.createElement("option"), m = { sel: sel, items: items, fixed: !!how.fixed, last: !!how.last, labels: [] };
+  items.forEach(function (x) { if (x[0].length > wide) wide = x[0].length; });
+  sel.setAttribute("autocomplete", "off");      // a browser is not to put back a choice of its own on reload
+  o.value = ""; o.textContent = title; sel.appendChild(o);
+  items.forEach(function (x, i) {
+    var pad = x[0]; while (pad.length < wide) pad += " ";
+    m.labels.push((how.codes ? pad + "   " + x[1] : x[0]).split(" ").join(NB));
+    o = document.createElement("option"); o.value = i; o.textContent = m.labels[i]; sel.appendChild(o);
+  });
+  sel.onchange = function () { var x = items[+sel.value]; if (sel.value === "" || !x) return; $("t").value = x[1]; tint(); whichSample(); make(!!(p && p.on)); };
+  bellMenus.push(m);
+}
+// The Text Sample menu is of the same kind as Spanish: it shows the sample last chosen, or the first, and never stands empty
+// (it stood empty in LibreWolf whenever the words in the box were not a sample; user1, 19 xi 2026).
+bellMenu($("sample"), SAMPLES[0][0], SAMPLES, { codes: false, fixed: true, last: true });
+bellMenu($("bell-u"), "Great Utterances", BELLS.utterances, { codes: false, fixed: false });
+["A", "I", "U", "E", "O"].forEach(function (letter) {
+  var sel = document.createElement("select"); sel.className = "bell"; sel.title = "Phrases that open on a sound of the letter " + letter + ", written in Bell's Visible Speech.";
+  $("bell-v").appendChild(sel); bellMenu(sel, letter, BELLS.vowels[letter], { codes: true, fixed: true });
+});
+// THE CONSONANTS, by Bell's own places, as his sheet sets them out (user1, 19 xi 2026: taught as the vowels are? "I absolutely do.")
+[["Lip", "the lips: f, v, wh, w, p, b, m"], ["Front", "the front of the tongue: y, sh, and the sound in pleasure"], ["Point", "the point of the tongue: th, s, z, t, d, n, and with them l and r"], ["Back", "the back of the tongue: k, g, ng, the ch of loch, and with them the breath, h"]].forEach(function (pl) {
+  var sel = document.createElement("select"); sel.className = "bell"; sel.title = "Phrases for the consonants of " + pl[1] + ". Written in Bell's Visible Speech.";
+  $("bell-c").appendChild(sel); bellMenu(sel, pl[0], BELLS.consonants[pl[0]], { codes: true, fixed: true });
+});
+// SPANISH, alone for now (user1, 19 xi 2026: "Let us begin the row with Spanish alone. That will remind me of the grayglyph-hunt and
+// what it will enable."). The menu's name is the phrase last chosen from it, or its first. The first is his own, from his sheet.
+bellMenu($("bell-es"), BELLS.spanish[0][0], BELLS.spanish, { codes: true, fixed: true, last: true });
 
 // ---------- what the page remembers ----------
 // user1, 18 xi 2026: "I'd like to remember all that the user sets, from theme size to settings to their currently entered text.
@@ -407,12 +488,13 @@ function choose(o) {       // every choice on the page set from one record, and 
   finish = !!o.finish; $("finish").classList.toggle("on", finish); $("toggles").classList.toggle("off", !finish);
   resound = !!o.resound; $("resound").classList.toggle("on", resound);
   TOGGLES.forEach(function (tg) { chain[tg[0]] = !!o.chain[tg[0]]; }); each("#toggles button", function (b) { b.classList.toggle("on", !!chain[b.getAttribute("data-part")]); });
-  if (p) { p.resound(resound); p.pace(dials.speed); }
+  if (p) { p.resound(resound); p.pace(paceNow()); }
   setLight(LIGHTS[o.light] ? o.light : f.light); whichSample();
 }
 $("reset").onclick = function () { var o = firstChoices(); o.text = $("t").value; choose(o); try { localStorage.removeItem(KEEP); } catch (e) {} make(!!(p && p.on)); };
 ["click", "input", "change"].forEach(function (ev) { document.addEventListener(ev, keepSoon, true); });
 addEventListener("pagehide", function () { if (keepTimer) { clearTimeout(keepTimer); keep(); } });
+addEventListener("pageshow", function () { whichSample(); });
 (function () { var o = null; try { o = JSON.parse(localStorage.getItem(KEEP) || "null"); } catch (e) {} choose(o && typeof o === "object" ? o : firstChoices()); })();
 make(false);     // the tape is made as the page opens, so there is something to see and to take hold of
 </script>

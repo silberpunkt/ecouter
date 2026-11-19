@@ -52,6 +52,7 @@ t('a score read, toned, fitted and sung lasts what it was fitted to', Math.abs(l
 var rp = R.say(sc, { turns: 2 });
 t('and the throat sings it', rp.length > 12000 && rp.length < 20000, (rp.length / RL.SR).toFixed(2) + ' s');
 t('the voices are eight, by name, and Phillippe is the stock voice', R.VOICES.names.length === 8 && R.VOICES.get('phillippe').arc === null && JSON.stringify(R.arc(sc0, 'phillippe').frames) === JSON.stringify(sc0.frames), R.VOICES.names.join(' '));
+t('a score from the sounds themselves is the score read from the words', JSON.stringify(R.fromCodes(RL.codes('Is it you?')).frames) === JSON.stringify(sc0.frames), RL.codes('Is it you?'));
 var la = R.as(sc0, 'lauren'), lp = R.say(la, { turns: 2 });
 t('a score carried in a voice is sung, and says how fast its tape should run', la.voice.name === 'lauren' && la.voice.speed === 0.96 && la.voice.steady === 0.65 && lp.length > 8000, (lp.length / RL.SR).toFixed(2) + ' s');
 var PFILE = FILE === 'ecouter.min.js' ? 'ecouter-player.min.js' : 'ecouter-player.js';   // the player ring: another file beside the library

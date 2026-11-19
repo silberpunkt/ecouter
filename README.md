@@ -89,7 +89,7 @@ Under Node: `const E = require('./ecouter-speech.js')`, with the same calls. [Th
 | `ecouter-speech.min.js` | the voice alone: English text to speech | 54,710 B | 15.4 KB |
 | `viriditas.min.js` | the colour alone, with no throat | 48,366 B | 13.2 KB |
 | `ecouter.min.js` | everything: voice, colour, and Bell's *Visible Speech* | 76,453 B | 21.1 KB |
-| `ecouter-score.min.js` | a ring beside the library: work on a score before it is sung, and the voices by name | 10,651 B | 3.9 KB |
+| `ecouter-score.min.js` | a ring beside the library: work on a score before it is sung, and the voices by name | 11,327 B | 4.0 KB |
 | `ecouter-player.min.js` | a second ring: a tape, a head that does not pop, the speed of the tape, and a room | 13,563 B | 4.7 KB |
 
 Each has a commented, unshrunk twin without `.min`. The `.min` files only drop comments: newlines and indentation are kept, so they stay readable. Compressed sizes are gzip -9, which is roughly what a web server sends.
@@ -101,6 +101,8 @@ var s = ECOUTER.SCORE.read(["Is", "it", "you"], ["", "", "?"]);
 s = ECOUTER.SCORE.sing(ECOUTER.SCORE.fit(ECOUTER.SCORE.tone(s, 1.03), [180, 150, 420]), 0.5);
 var pcm = ECOUTER.SCORE.say(s);
 ```
+
+A score can also be made from the sounds themselves, whatever they were read from: `ECOUTER.SCORE.fromCodes(ECOUTER.codes(text))`. With the whole library that includes Bell's *Visible Speech*, so a line of his glyphs can be carried in a voice, fitted and sung like any other. [The front page](https://silberpunkt.github.io/ecouter/) has a menu of them.
 
 Under Node, `require('./ecouter-score.js')` hangs it on the whole library; to hang it on another, `require('./ecouter-score.js')(require('./ecouter-speech.js'))`.
 
@@ -150,7 +152,7 @@ node test/smoke.js          # the commented files
 node test/smoke.js min      # the .min files
 ```
 
-28 checks, covering all three libraries and the two rings, in under a second. Under QuickJS: `qjs --std test/smoke.js`.
+29 checks, covering all three libraries and the two rings, in under a second. Under QuickJS: `qjs --std test/smoke.js`.
 
 **The temp cache.** Under Node or QuickJS, Ecouter keeps each gusted sound it makes in `temp-cache/`, in the folder you run from, named by a hash of the sound and its settings. Making the same sound again is then instant. The folder is safe to delete, and git ignores it. To keep nothing on disk, set `ECOUTER.CHAIN.cache = null`. In a web page there is no disk, and no cache.
 

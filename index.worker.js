@@ -1,11 +1,12 @@
 // index.worker.js -- one sentence, sung in a voice. Ecouter's front page makes each sentence in a worker of its own
 // with this; and loads the same file as a plain script, so that where a worker cannot start the page can do the same
-// work itself. d: { n, words, punct, quote, voice, tone, song, steady, chain }. Back comes the sound, and the score's
+// work itself. d: { n, words, punct, quote, voice, tone, song, steady, chain }, or codes in place of the words. Back comes the sound, and the score's
 // own account of itself, a frame at a time: how long, what pitch, how voiced, which word.
 if (typeof importScripts === 'function') importScripts('ecouter.js', 'ecouter-score.js');
 function ecouterSing(d) {
   var E = ECOUTER, S = E.SCORE, i, f;
-  var read = S.read(d.words, d.punct, { tune: d.chain.conduction === false ? 'apology' : 'conduction' });
+  var tune = d.chain.conduction === false ? 'apology' : 'conduction';
+  var read = d.codes ? S.fromCodes(d.codes, { tune: tune }) : S.read(d.words, d.punct, { tune: tune });     // d.codes: the sounds themselves, where the text was Bell's
   var sc = S.as(read, d.voice, { tone: d.tone, song: d.song, steady: d.steady, lift: d.quote });
   var pcm = S.say(sc, { voice: d.chain }), n = sc.frames.length;
   var ms = new Float32Array(n), f0 = new Float32Array(n), vo = new Float32Array(n), w = new Int16Array(n);
