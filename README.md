@@ -3,6 +3,8 @@
 A tiny English text-to-speech Web library in one &lt;60kb file. Optional features included.<br>
 Ecouter converts English words to waveform samples with classical computing techniques.
 
+[![Ecouter's own page: a sentence, the same sentence in the colors of its tones, the voices and their dials, and the sound as a wave and a spectrogram](media/ecouter%20screenshot%20.PNG)](https://silberpunkt.github.io/ecouter/)
+
 ## Viriditas: Accurate color from words.
 
 Viriditas is why Ecouter exists. We needed Ecouter to exist because the [Web Speech API](https://webaudio.github.io/web-speech-api/) does not give you back the sounds your computer's voices worked hard to produce. No, you can't have them. We would have used them to color the text, of course. That's not available. (In the current draft, `speechSynthesis.speak()` still returns nothing, and the request to [send its voice to a stream a page can use](https://github.com/WebAudio/web-speech-api/issues/69) has been open since 2019.)
