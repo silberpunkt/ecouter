@@ -23,6 +23,21 @@
   #lit { font-size: var(--sample); line-height: 1.6; white-space: pre-wrap; background: var(--pane); padding: 12px 16px; border: 1px solid var(--line); border-top: 0; min-height: 2.6em; --glow: 1 }
   #lit span[style*="--room"] { background: rgb(var(--room) / calc(var(--ra) * var(--glow))) }
   #lit:focus { outline: 1px solid var(--edge) }
+  /* HIGH CONTRAST (user1, 19 xi 2026). Windows High Contrast has a browser put its own colors over a page's, and the tint went with
+     them. But here the colors are what is being said, not how the page is dressed: so the tinted pane keeps its own, ground and all.
+     The rest of the page is left to the visitor's own setting, and the sign is then drawn plainly in the visitor's ink. */
+  #lit { forced-color-adjust: none }
+  /* And a switch, seen only under High Contrast, at the very foot of the page, under a single line at half strength, set at right
+     (user1: "Accessibility users like me can be asked to look down"). Yours: the page in the visitor's own forced colors, as it
+     opens. The page's: the page as any other visitor sees it. Nobody's setting is overridden unless they ask. While the colors are
+     the visitor's, a button that is on cannot show it by our color, so it shows it by the system's own highlight. */
+  #hc { display: none; margin-top: 26px } .hc-line { border-top: 1px solid currentColor; opacity: 0.5 } .hc-row { justify-content: flex-end; margin-top: 10px }
+  @media (forced-colors: active) {
+    #hc { display: block }
+    html:not(.own) button.on { forced-color-adjust: none; background: Highlight; color: HighlightText; border-color: Highlight }
+    html:not(.own) .logo { color: CanvasText } html:not(.own) .logo .lg { fill: CanvasText !important }
+  }
+  html.own { forced-color-adjust: none }
   .w.done { box-shadow: 1px 0 0 var(--dim) }
   .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0 } .gap { flex: 1 1 auto } .lbl { color: var(--dim) }
   button { font: inherit; color: var(--ink); background: var(--btn); border: 1px solid var(--edge); border-radius: 2px; padding: 3px 12px; cursor: pointer }
@@ -57,6 +72,7 @@
 <dt><i>&#x1F3A8;&#xFE0E;</i></dt><dd><b>The color.</b> Each letter takes the color of the tone the voice would give it. Flat is green. A question lifts toward blue, an exclamation drops toward red. The same text gives the same colors every time.</dd>
 <dt><i>&#x1F514;&#xFE0E;</i></dt><dd><b>A.M. Bell.</b> Alexander Melville Bell drew Visible Speech in 1867 as pictures of the mouth, so that a sound could be read without having been heard, in any tongue. Here each of his signs is three keyboard characters. Choose an A.M. Bell sample and the Bell codes alone go in the box: Ecouter speaks them from the glyphs, through the same mouth, and colors them by the same tones. His forms can write any tongue. This voice has only English sounds yet, so the Spanish here is said by an English mouth.</dd>
 <dt><i>&#x25CE;&#xFE0E;</i></dt><dd><b>The rings.</b> The library is the pearl: English in, samples out. About it are rings, each a small file of its own. The score ring works on a sentence before it is sung, and holds the voices by name. The player ring treats the sound as a tape, and reads it with a head. This page uses all three.</dd>
+<dt><i>&#x25D1;&#xFE0E;</i></dt><dd><b>High Contrast.</b> If your system forces its own colors on pages, the tinted words still keep theirs, because there the colors are what is being said. At the very foot of the page a switch then appears: Yours, or The page's.</dd>
 <dt><i>&#x1F512;&#xFE0E;</i></dt><dd><b>What it keeps.</b> Your choices and your words, in this browser and nowhere else, so that they are here when you come back. Nothing is sent anywhere, and everything is made in your browser. Reset puts the choices back as they first were, and leaves your words alone.</dd>
 <dt><i>&#x25E1;&#xFE0E;</i></dt><dd><b>The sign.</b> A lower hemicircle: an open mouth, speaking and perhaps smiling. Beside it the word, set in <a href="https://github.com/silberpunkt/eniee">Eniee Slender</a> and wearing its own coloring.</dd>
 <dt><i>&#x1F517;&#xFE0E;</i></dt><dd><b>More.</b> <a href="examples/proof.html">The proof</a> that the colors are the pitch. <a href="examples/tint.html">The tint workbench</a>. <a href="examples/say.html">Say</a>, with the wave and the spectrogram. <a href="examples/tape.html">Tape</a>, the player alone. And <a id="repo" href="https://github.com/silberpunkt/ecouter#readme">the source, with its notes</a>.</dd>
@@ -99,6 +115,7 @@
 <div class="row"><span class="lbl">Reset choices:</span><button id="reset" title="Every choice on this page put back as it first was: theme, size, coloring, voices and their dials, the finish. Your words are left alone.">Reset</button></div>
 
 <p class="foot">Two views of one sound, on one clock: the wave, then its spectrogram, low at the foot.<br>The grey is the sound itself.<br>The colored lines are the pitch the score asked for, on the fundamental and its first two harmonics.<br>They lie on the grey bands because they are the same pitch.</p>
+<div id="hc"><div class="hc-line"></div><div class="row hc-row"><span class="lbl">Colors:</span><span class="seg"><button id="hc-yours" class="on" title="The page in your own High Contrast colors. The tinted words keep their colors either way, because there the colors are what is being said.">Yours</button><button id="hc-page" title="The page in its own colors, as a visitor without High Contrast sees it. Your choice is kept.">The page's</button></span></div></div>
 
 <script src="ecouter.js"></script>
 <script src="ecouter-score.js"></script>
@@ -461,15 +478,20 @@ bellMenu($("bell-u"), "Great Utterances", BELLS.utterances, { codes: false, fixe
 // what it will enable."). The menu's name is the phrase last chosen from it, or its first. The first is his own, from his sheet.
 bellMenu($("bell-es"), BELLS.spanish[0][0], BELLS.spanish, { codes: true, fixed: true, last: true });
 
+// ---------- High Contrast: whose colors ----------
+var colors = "yours";
+function setColors(c) { colors = c === "page" ? "page" : "yours"; document.documentElement.classList.toggle("own", colors === "page"); $("hc-yours").classList.toggle("on", colors === "yours"); $("hc-page").classList.toggle("on", colors === "page"); }
+$("hc-yours").onclick = function () { setColors("yours"); }; $("hc-page").onclick = function () { setColors("page"); };
+
 // ---------- what the page remembers ----------
 // user1, 18 xi 2026: "I'd like to remember all that the user sets, from theme size to settings to their currently entered text.
 // People may link this page as the only place their words have ever been in color." So everything set here is kept, in this
 // browser's own store and nowhere else, and About says so. Reset puts the choices back, and leaves the words alone.
 var KEEP = "ecouter.front", keepTimer = 0;
-function firstChoices() { return { text: SAMPLES[0][1], light: "night", size: 6, mode: "omnia", room: "normal", glows: {}, mix: 0.75, full: 0.125, auto: false, voice: ORDER[0], per: {}, finish: true, resound: true, chain: E.CHAIN.settings(E.CHAIN.PRESETS[E.CHAIN.HOUSE_NAME]) }; }
+function firstChoices() { return { text: SAMPLES[0][1], light: "night", size: 6, mode: "omnia", room: "normal", glows: {}, mix: 0.75, full: 0.125, auto: false, voice: ORDER[0], per: {}, finish: true, resound: true, colors: "yours", chain: E.CHAIN.settings(E.CHAIN.PRESETS[E.CHAIN.HOUSE_NAME]) }; }
 function choices() {
   var ch = {}; TOGGLES.forEach(function (tg) { ch[tg[0]] = !!chain[tg[0]]; }); PER[voiceName] = dials;
-  return { v: 1, text: $("t").value, light: light, size: size, mode: mode, room: roomName, glows: glows, mix: $("mix").value, full: $("full").value, auto: $("auto").classList.contains("on"), voice: voiceName, per: PER, finish: finish, resound: resound, chain: ch };
+  return { v: 1, text: $("t").value, light: light, size: size, mode: mode, room: roomName, glows: glows, mix: $("mix").value, full: $("full").value, auto: $("auto").classList.contains("on"), voice: voiceName, per: PER, finish: finish, resound: resound, colors: colors, chain: ch };
 }
 function keep() { keepTimer = 0; try { localStorage.setItem(KEEP, JSON.stringify(choices())); } catch (e) {} }
 function keepSoon() { if (!keepTimer) keepTimer = setTimeout(keep, 300); }
@@ -486,7 +508,7 @@ function choose(o) {       // every choice on the page set from one record, and 
   ORDER.forEach(function (n) { d = o.per && o.per[n]; if (d && isFinite(+d.tone) && isFinite(+d.speed) && isFinite(+d.song) && isFinite(+d.steady)) PER[n] = { tone: +d.tone, speed: +d.speed, song: +d.song, steady: +d.steady }; });
   dials = PER[voiceName] || own(voiceName); each("#voices button", function (b) { b.classList.toggle("on", b.getAttribute("data-voice") === voiceName); }); showDials();
   finish = !!o.finish; $("finish").classList.toggle("on", finish); $("toggles").classList.toggle("off", !finish);
-  resound = !!o.resound; $("resound").classList.toggle("on", resound);
+  resound = !!o.resound; $("resound").classList.toggle("on", resound); setColors(o.colors);
   TOGGLES.forEach(function (tg) { chain[tg[0]] = !!o.chain[tg[0]]; }); each("#toggles button", function (b) { b.classList.toggle("on", !!chain[b.getAttribute("data-part")]); });
   if (p) { p.resound(resound); p.pace(paceNow()); }
   setLight(LIGHTS[o.light] ? o.light : f.light); whichSample();
