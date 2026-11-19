@@ -1,10 +1,11 @@
-# Ecouter
+<h1><a href="https://silberpunkt.github.io/ecouter/"><picture><source media="(prefers-color-scheme: dark)" srcset="media/ecouter-logo-night.svg"><img alt="Ecouter" src="media/ecouter-logo-day.svg" height="53"></picture></a></h1>
 
-A tiny English text-to-speech, in one file of 54.7 KB.
+A tiny English text-to-speech Web library in one &lt;60kb file. Optional features included.<br>
+Ecouter converts English words to waveform samples with classical computing techniques.
 
-## Viriditas
+## Viriditas: Accurate color from words.
 
-Why Ecouter exists. We needed Ecouter to exist because the [Web Speech API](https://webaudio.github.io/web-speech-api/) does not give you back the sounds your computer's voices worked hard to produce. No, you can't have them. We would have used them to color the text, of course. That's not available. (In the current draft, `speechSynthesis.speak()` still returns nothing, and the request to [send its voice to a stream a page can use](https://github.com/WebAudio/web-speech-api/issues/69) has been open since 2019.)
+Viriditas is why Ecouter exists. We needed Ecouter to exist because the [Web Speech API](https://webaudio.github.io/web-speech-api/) does not give you back the sounds your computer's voices worked hard to produce. No, you can't have them. We would have used them to color the text, of course. That's not available. (In the current draft, `speechSynthesis.speak()` still returns nothing, and the request to [send its voice to a stream a page can use](https://github.com/WebAudio/web-speech-api/issues/69) has been open since 2019.)
 
 We did the impossible, to scrape history, sound, C, evidence, public papers, and human memory, to build a 55 KB Text-To-Speech synthesizer that actually gives you *tones of speech*. We needed it, you have it. Along the way, we found the wonderful Bells of Alexander Melville Bell, the father of A. Graham Bell, inventor of our telephone, along with many others.
 
@@ -181,6 +182,7 @@ In the 1980s, Digital Equipment Corporation's hardware text-to-speech system, [D
 - **The throat:** D. H. Klatt, "Software for a cascade/parallel formant synthesizer", *J. Acoust. Soc. Am.* 67 (3), 971–995 (1980), doi:10.1121/1.383940.
 - **The vowels:** Peterson and Barney, *JASA* 24 (1952).
 - **Beepages:** after Douglas Engelbart's bips.
+- **The sign:** a lower hemicircle, an open mouth, speaking and perhaps smiling. The word beside it is set in [Eniee Slender](https://github.com/silberpunkt/eniee) and wears the colors Ecouter gives it.
 
 The code is MIT; see [LICENSE](LICENSE). The rules remain public domain.
 
